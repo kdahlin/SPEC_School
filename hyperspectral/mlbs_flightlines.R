@@ -21,14 +21,16 @@ library(tidyverse)
 
 # Set working directory
 
-setwd("/Users/adrianauscanga/Documents/Documents/spec_school/data/flightlines")
+setwd("/Users/adrianauscanga/Documents/Documents/spec_school/data/flightlines") # change to own working directory
 
 #------------------------------ ENVI files ----------------------------------
 
 # Import ENVI files of trait data from MLBS flightlines,
-# extract Nitrogen data and export it to tiff files.
+# extract Nitrogen data and export to tiff files.
 # There are three bands with nitrogen data (mean, S.D., and CV)
-# and one tiff file per flightline.
+# Make one tiff file per flightline.
+# If other traits are needed, look for the band number of the trait of
+# interest and change the array slice (see below)
 
 ls <- grep(list.files(), pattern= '*.hdr', invert=TRUE, value=TRUE)
 
@@ -60,7 +62,8 @@ for (i in ls){
   band_names <- as.character(str_sub(band_names, 3, -2))
   band_names <- unlist(strsplit(band_names, ", "))
   
-  # Extract Nitrogen data (slices 52-54), change that range (and variable names) for other traits (see list of traits below)
+  # Extract Nitrogen data (slices 52-54), 
+  # change this range (and variable names) for other traits (see list of traits in band_names)
   envi_nitrogen <- envi[1:lines, 1:samples, 52:54]
   
   # Convert to raster
@@ -88,7 +91,7 @@ for (i in ls){
 
 # ------------------------     Tiff files mosaic    -----------------------------
 
-# Read all nitrogen tiff files with terra and make a mosaic
+# Read all nitrogen tiff files and make a mosaic
 
 ls <- list.files(pattern = "*.tif")
 raster_files <- lapply(ls, rast)
@@ -96,7 +99,7 @@ raster_files <- lapply(ls, rast)
 # Make a SpatRasterCollection from a list
 rsrc <- sprc(raster_files)
 
-# Mosaic
+# Mosaic (the default option averages values of overlapping pixels)
 mlbs_nitrogen <- mosaic(rsrc)
 
 # See result in a plot
