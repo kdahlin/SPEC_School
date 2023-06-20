@@ -43,7 +43,7 @@ for (i in seq(nfile)) {
     
     image <- name 
     display = F
-    img<-import_fisheye(image,
+    img<-import_fisheye(image, # replace "image" with "iurl" if using windows
                         channel = 'B',
                         circ.mask=list(xc=80,yc=60,rc=80), #xcenter, ycenter, radius
                         circular=F,
