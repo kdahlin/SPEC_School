@@ -32,3 +32,14 @@ ggplot(MLBS.data) +
     labs(x = 'Shannons Diversity', y = 'AGB')
 
 
+
+summary(lm(AGB ~ diversity_shannon, data = MLBS.data))
+cor(MLBS.data$AGB, MLBS.data$diversity_shannon)
+
+ggplot(MLBS.data) +
+    geom_point(aes(x = diversity_shannon, y = AGB), size = 4, shape = 1, stroke = 1) +
+    geom_abline(slope = 37.84, intercept = 125.09, linewidth = 1, color = 'red') +
+    annotate('text', x = 1.7, y = 200, label = 'p = 0.132', size = 6, color = 'red') +
+    theme_bw(base_size = 20) +
+    labs(x = 'Shannons Diversity', y = 'AGB')
+
