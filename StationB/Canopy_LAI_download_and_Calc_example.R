@@ -9,14 +9,19 @@ library(geoNEON)
 options(stringsAsFactors=F)
 # install.packages('hemispheR')
 library(hemispheR)
+library(dplyr)
+library(ggplot2)
 
 
-wd <- '~/Current Projects/SpecSchool/NEON_LAI/'
+wd <- '/Users/gracemcleod/Documents/SPEC/In_person_week/SPEC_School/StationB'
 setwd(wd)
+
+
+# DOWNLOAD LAI DATA ........................................................................................
 
 dpid <- "DP1.10017.001"
 site <- "MLBS"
-date <- '2022-10'
+date <- '2022-05'
 
 LAI <- loadByProduct(dpID = dpid,
                      site = site,
@@ -32,7 +37,7 @@ for (i in seq(nfile)) {
     iurl <- urls[i]
     name <- unlist(strsplit(iurl, '/'))[10]
     
-    download.file(destfile = name, url=iurl, method='wget', quiet = T)
+    download.file(destfile = name, url=iurl, quiet = T)
     
     # LAI calculation from hemispheR package 
     
@@ -81,3 +86,33 @@ for (i in seq(nfile)) {
     if (i == 1) {LAI.vals <- canopy$L} else {LAI.vals <- c(LAI.vals, canopy$L)}
     
 }
+
+
+# INCORPORATE IMAGE AND PLOT DATA ........................................................................................
+
+# Make a master dataframe
+LAI_df <- as.data.frame(LAI.vals) # calculated LAI values
+LAI_df$imageFileUrl <- urls[1:113] # I stopped the loop early and don't have all of the image files.
+
+# test
+image_plot <- joinTableNEON(LAI$dhp_perimagefile,
+                      LAI$dhp_perplot,
+                      name1="dhp_perimagefile",
+                      name2="dhp_perplot")
+# subset to just the images I downloaded
+sub_imageplot <- subset(image_plot, imageFileUrl %in% LAI_df$imageFileUrl)
+# merge with LAI_df
+LAI_df <- merge(LAI_df, sub_imageplot, by="imageFileUrl")
+
+
+# CHECK OUT THE DATA! ........................................................................................
+
+ggplot(LAI_df, aes(x=startDate.y, y=LAI.vals, color=plotID)) +
+  geom_smooth() +
+  theme_bw()
+
+
+
+
+
+
