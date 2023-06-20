@@ -1,28 +1,33 @@
-library(terra)
-library(tidyverse)
-library(ggplot2)
-library(corrplot)
+libs <- list('terra', 'tidyverse', 'ggplot2', 'corrplot')
+invisible(lapply(libs, library, character.only = T))
 
+# Set wd
 wd <- '~/Current Projects/SpecSchool/SPEC_School/StationC/'
 setwd(wd)
 
+# load the data
 plots <- vect('data/Kamoske_etal_2022_data/Kamoske_etal_2022_data/neon_plots_mlbs.shp')
 agb <- rast('data/MLBS_agbEcoregion_20m.tif')
 MLBS.data <- read.csv('data/Kamoske_etal_2022_data/Kamoske_etal_2022_data/all_metrics_20200803.csv') %>%
     filter(siteID == 'MLBS')
 
-
+# display the data
 plot(agb)
 plot(plots, add = T)
+
+# extract the agb points
 agb.points <- terra::extract(agb, plots, fun=mean, ID = F)
+# add the plotID names
 agb.points <- cbind.data.frame(plotID = plots$id, agb.points)
 names(agb.points)[2] <- 'AGB'
 
+# merge the data
 MLBS.data <- merge(MLBS.data, agb.points, by = 'plotID')
 summary(MLBS.data)
 
 
 # Relationship between diversity and AGB ----------------------------------
+# quick linear model
 summary(lm(AGB ~ diversity_shannon, data = MLBS.data)) # p = 0.132
 cor(MLBS.data$AGB, MLBS.data$diversity_shannon) # rho = 0.272
 
