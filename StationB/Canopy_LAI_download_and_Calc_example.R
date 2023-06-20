@@ -1,4 +1,4 @@
-source('~/R/clean.r')
+# source('~/R/clean.r')
 library(sp)
 library(raster)
 library(neonUtilities)
@@ -12,38 +12,61 @@ library(hemispheR)
 library(dplyr)
 library(ggplot2)
 
-
-wd <- '/Users/gracemcleod/Documents/SPEC/In_person_week/SPEC_School/StationB'
-setwd(wd)
+# Notes:
+# requires a version of wget on your computer.
+# hemispheR code below is pulled directly from the example in the repo link here:
+# https://gitlab.com/fchianucci/hemispheR
 
 
 # DOWNLOAD LAI DATA ........................................................................................
 
+=======
+# setwd
+wd <- '~/Current Projects/SpecSchool/SPEC_School/StationB/'
+setwd(wd)
+
+# data product ID
+
 dpid <- "DP1.10017.001"
+
+# site ID
 site <- "MLBS"
 startdate <- '2022-05'
 enddate <- "2022-06"
+=======
 
+
+# Obtain LAI data
 LAI <- loadByProduct(dpID = dpid,
                      site = site,
                      startdate = startdate,
                      enddate= enddate,
                      check.size = F)
 
+# Obtain overstory hemispherical list of urls
 urls <- grep('overstory',LAI$dhp_perimagefile$imageFileUrl, value = T)
+# number of files (for the loop)
 nfile <- length(urls)
-dir.create(startdate)
-setwd(startdate)
 
+# Create folder with date name
+dir.create(date)
+# update WD
+setwd(date)
+
+
+# for loop
 for (i in seq(nfile)) {
-    iurl <- urls[i]
+    # subset URL
+    iurl <- urls[i] 
+    # obtain image name
     name <- unlist(strsplit(iurl, '/'))[10]
     
     download.file(destfile = name, url=iurl, quiet = T)
+
     
-    # LAI calculation from hemispheR package 
-    
+    ## ~~ LAI calculation from hemispheR package ~~ ##
     image <- name 
+    # set to T for debugging
     display = F
     img<-import_fisheye(iurl, 
                         channel = 'B',
@@ -79,16 +102,20 @@ for (i in seq(nfile)) {
         message = F
     )
     
+    # calculate LAI
     canopy<-canopy_fisheye(gap.frac)
     canopy
     # LAI = 4 using high-res
     # LAI = 3 using jpeg
     
-    # Data frame creation
+    # remove the downloaded files
+    # comment out if you want to keep the photos
+    file.remove(name)
+    
+    # Data frame creation (currently could be better to include geolocation coordinates)
     if (i == 1) {LAI.vals <- canopy$L} else {LAI.vals <- c(LAI.vals, canopy$L)}
     
 }
-
 
 # INCORPORATE IMAGE AND PLOT DATA ........................................................................................
 
@@ -113,8 +140,4 @@ ggplot(LAI_df, aes(x=startDate.y, y=LAI.vals, color=plotID)) +
   geom_smooth() +
   theme_bw()
 
-
-
-
-
-
+write.csv(LAI.vals, paste0('LAI_values_',date,'.csv'))
