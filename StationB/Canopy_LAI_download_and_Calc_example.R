@@ -10,34 +10,54 @@ options(stringsAsFactors=F)
 # install.packages('hemispheR')
 library(hemispheR)
 
+# Notes:
+# requires a version of wget on your computer.
+# hemispheR code below is pulled directly from the example in the repo link here:
+# https://gitlab.com/fchianucci/hemispheR
 
-wd <- '~/Current Projects/SpecSchool/NEON_LAI/'
+# setwd
+wd <- '~/Current Projects/SpecSchool/SPEC_School/StationB/'
 setwd(wd)
 
+# data product ID
 dpid <- "DP1.10017.001"
+
+# site ID
 site <- "MLBS"
+
+# Date
 date <- '2022-10'
 
+# Obtain LAI data
 LAI <- loadByProduct(dpID = dpid,
                      site = site,
                      startdate = date,
                      check.size = F)
 
+# Obtain overstory hemispherical list of urls
 urls <- grep('overstory',LAI$dhp_perimagefile$imageFileUrl, value = T)
+# number of files (for the loop)
 nfile <- length(urls)
+
+# Create folder with date name
 dir.create(date)
+# update WD
 setwd(date)
 
+# for loop
 for (i in seq(nfile)) {
-    iurl <- urls[i]
+    # subset URL
+    iurl <- urls[i] 
+    # obtain image name
     name <- unlist(strsplit(iurl, '/'))[10]
-    
+    # download file
     download.file(destfile = name, url=iurl, method='wget', quiet = T)
     
-    # LAI calculation from hemispheR package 
-    
+    ## ~~ LAI calculation from hemispheR package ~~ ##
     image <- name 
+    # set to T for debugging
     display = F
+    # import fisheye
     img<-import_fisheye(image,
                         channel = 'B',
                         circ.mask=list(xc=80,yc=60,rc=80), #xcenter, ycenter, radius
@@ -72,12 +92,19 @@ for (i in seq(nfile)) {
         message = F
     )
     
+    # calculate LAI
     canopy<-canopy_fisheye(gap.frac)
     canopy
     # LAI = 4 using high-res
     # LAI = 3 using jpeg
     
-    # Data frame creation
+    # remove the downloaded files
+    # comment out if you want to keep the photos
+    file.remove(name)
+    
+    # Data frame creation (currently could be better to include geolocation coordinates)
     if (i == 1) {LAI.vals <- canopy$L} else {LAI.vals <- c(LAI.vals, canopy$L)}
     
 }
+
+LAI.vals
