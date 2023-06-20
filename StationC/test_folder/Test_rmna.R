@@ -1,0 +1,1 @@
+#EXemple script Ny Aina 
