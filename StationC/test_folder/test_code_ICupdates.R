@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 library('raster')
+=======
+plot_info <- read.csv('plotdata.csv')
+agb <- raste('agb_raster.tif')
+>>>>>>> 96c2c9c4e8a7f0d1f74dbb0da5525886f329d94d
 
 setwd('/Users/isamarcortes/Documents/SPEC_School/StationC')###change this to your local repo
 
