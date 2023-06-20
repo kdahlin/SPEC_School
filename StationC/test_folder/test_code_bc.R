@@ -48,7 +48,7 @@ ggplot(MLBS.data) +
 
 # Relationship between AGB and other vars ---------------------------------
 AGB.data <- MLBS.data %>% select(AGB,
-                                 eastness_mean, northness_mean, slope_mean, tpi_mean, tri_mean, 
+                                 eastness_mean, northness_mean, slope_mean, tpi_mean, tri_mean, dsm_mean,
                                  latitude, longitude,
                                  PRI_mean, NDVI_mean, lai_mean)
 
@@ -58,7 +58,7 @@ c.agb$corr[1,]
 
 # Relationship between diversity and other vars ---------------------------
 Div.data <- MLBS.data %>% select(diversity_shannon,
-                                 eastness_mean, northness_mean, slope_mean, tpi_mean, tri_mean, 
+                                 eastness_mean, northness_mean, slope_mean, tpi_mean, tri_mean, dsm_mean,
                                  latitude, longitude,
                                  PRI_mean, NDVI_mean, lai_mean)
 
