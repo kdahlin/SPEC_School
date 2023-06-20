@@ -1,5 +1,5 @@
-plot_info <- read.csv(‘plotdata.csv’)
-agb <- raste(“agb_raster.tif’)
+plot_info <- read.csv('plotdata.csv')
+agb <- raste('agb_raster.tif')
 
 coordinates(plot_info) = ~ lon + lat
 crs(plot_info) <- crs(agb)
