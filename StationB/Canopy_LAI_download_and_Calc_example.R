@@ -49,6 +49,7 @@ urls <- grep('overstory',LAI$dhp_perimagefile$imageFileUrl, value = T)
 nfile <- length(urls)
 
 # Create folder with date name
+date <- '2022-05'
 dir.create(date)
 # update WD
 setwd(date)
