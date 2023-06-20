@@ -1,4 +1,4 @@
-source('~/R/clean.r')
+# source('~/R/clean.r')
 library(sp)
 library(raster)
 library(neonUtilities)
@@ -107,4 +107,4 @@ for (i in seq(nfile)) {
     
 }
 
-LAI.vals
+write.csv(LAI.vals, paste0('LAI_values_',date,'.csv'))
