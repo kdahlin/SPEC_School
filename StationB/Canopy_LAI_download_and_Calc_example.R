@@ -21,17 +21,19 @@ setwd(wd)
 
 dpid <- "DP1.10017.001"
 site <- "MLBS"
-date <- '2022-05'
+startdate <- '2022-05'
+enddate <- "2022-06"
 
 LAI <- loadByProduct(dpID = dpid,
                      site = site,
-                     startdate = date,
+                     startdate = startdate,
+                     enddate= enddate,
                      check.size = F)
 
 urls <- grep('overstory',LAI$dhp_perimagefile$imageFileUrl, value = T)
 nfile <- length(urls)
-dir.create(date)
-setwd(date)
+dir.create(startdate)
+setwd(startdate)
 
 for (i in seq(nfile)) {
     iurl <- urls[i]
@@ -43,7 +45,7 @@ for (i in seq(nfile)) {
     
     image <- name 
     display = F
-    img<-import_fisheye(image, # replace "image" with "iurl" if using windows
+    img<-import_fisheye(iurl, 
                         channel = 'B',
                         circ.mask=list(xc=80,yc=60,rc=80), #xcenter, ycenter, radius
                         circular=F,
