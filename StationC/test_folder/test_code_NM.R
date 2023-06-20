@@ -23,4 +23,6 @@ plots_combined<-merge(plot_intersect, plotm, by="plotID")
 colnames(plots_combined)[3]<-"AGB" # Renaming AG biomass column 
 
 ggplot(plots_combined, aes(diversity_shannon, AGB))+geom_point() #Plotting
-#the end
+
+
+summary(lm(AGB~ dsm_mean, data=plots_combined))
