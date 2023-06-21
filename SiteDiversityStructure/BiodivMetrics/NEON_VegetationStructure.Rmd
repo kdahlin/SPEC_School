@@ -1,0 +1,57 @@
+---
+title: "NEON site vegetation structure"
+author: "Lizbeth G Amador"
+date: "2023-06-19"
+output: pdf_document
+---
+
+
+Load required libraries  
+
+```{r, libraries}
+require(neonUtilities, quietly = TRUE)
+require(neonOS, quietly = TRUE)
+require(tidyverse, quietly = TRUE)
+```
+
+
+Presets
+```{r}
+#keep strings as character 
+options(stringsAsFactors = F)
+```
+
+
+Read in 'Vegetation Structure' data product
+```{r}
+vegs = loadByProduct(
+  dpID = "DP1.10098.001", #Data product ID - Required
+  site = c("RMNP", "OSBS", "ABBY", "GUAN"), 
+  startdate = "2018-01", enddate = "2018-12", #Dates - Required
+  check.size = F, #will notify size before downloading - answer prompt to proceed!
+  release = 'RELEASE-2023'
+)
+```
+
+Looking at the variables and table descriptions for each table; multiple 
+dataframes exist in the `vegs` object (includes metadata tables).
+```{r}
+#peeking at the variable table -- same function with pre-downloaded data
+View(vegs$variables_10098)
+#Gives description for each table
+View(vegs$readme_10098)
+```
+ 
+ 
+Saving dataframes from downloaded list
+```{r}
+#woody plant biomass & productivity 
+woody = vegs$vst_apparentindividual
+
+#non-woody plant (non-herbaceous perennial) biomass & productivity 
+nonwoody = vegs$`vst_non-woody`
+```
+
+
+
+
