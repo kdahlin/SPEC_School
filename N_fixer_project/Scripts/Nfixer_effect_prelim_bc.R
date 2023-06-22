@@ -82,6 +82,7 @@ ggplot(Nfix.N.plot) +
     theme_bw(base_size = 20) +
     labs(x = '', y = 'Value')
 
+
 t.test(Nfix.N$nitrogen_mean ~ Nfix.N$Nfix)
 t.test(Nfix.N$nitrogen_sd ~ Nfix.N$Nfix)
 t.test(Nfix.N$nitrogen_cv ~ Nfix.N$Nfix)
