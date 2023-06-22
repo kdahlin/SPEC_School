@@ -26,10 +26,10 @@ Read in 'Vegetation Structure' data product
 ```{r}
 vegs = loadByProduct(
   dpID = "DP1.10098.001", #Data product ID - Required
-  site = c("RMNP", "OSBS", "ABBY", "GUAN"), 
+  site = c("RMNP", "OSBS", "ABBY", "GUAN", "MLBS"), 
   startdate = "2018-01", enddate = "2018-12", #Dates - Required
   check.size = F, #will notify size before downloading - answer prompt to proceed!
-  release = 'RELEASE-2023'
+  release = 'RELEASE-2023' #most recent version
 )
 ```
 
@@ -47,10 +47,14 @@ Saving dataframes from downloaded list
 ```{r}
 #woody plant biomass & productivity 
 woody = vegs$vst_apparentindividual
+#write.csv(woody, "NEON_Woody_VegStructure_selectsites2018.csv", row.names = FALSE)
 
 #non-woody plant (non-herbaceous perennial) biomass & productivity 
 nonwoody = vegs$`vst_non-woody`
+#write.csv(nonwoody, "NEON_NonWoody_VegStructure_selectsites2018.csv", row.names = FALSE)
 ```
+
+
 
 
 
