@@ -7,4 +7,4 @@ Diego Rocha
 Kikiola Michael Alegbeleye 
 Lizbeth Amador
 
-<Description of scripts & programs in this repo folder>
+<(brief?) description of scripts & programs in this repo folder>
