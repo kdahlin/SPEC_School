@@ -5,10 +5,7 @@ date: "2023-06-19"
 output: pdf_document
 ---
 
-
-Load required libraries  
-
-```{r, libraries}
+```{r, libraries, echo=FALSE}
 require(neonUtilities, quietly = TRUE)
 require(neonOS, quietly = TRUE)
 require(tidyverse, quietly = TRUE)
@@ -16,13 +13,14 @@ require(tidyverse, quietly = TRUE)
 
 
 Presets
-```{r}
+```{r, preset}
 #keep strings as character 
 options(stringsAsFactors = F)
 ```
 
 
-Read in 'Vegetation Structure' data product
+# Data Acquisition  
+Read in 'Vegetation Structure' data product form the NEON data portal 
 ```{r}
 vegs = loadByProduct(
   dpID = "DP1.10098.001", #Data product ID - Required
@@ -35,16 +33,17 @@ vegs = loadByProduct(
 
 Looking at the variables and table descriptions for each table; multiple 
 dataframes exist in the `vegs` object (includes metadata tables).
-```{r}
+```{r, variables and metadata}
 #peeking at the variable table -- same function with pre-downloaded data
 View(vegs$variables_10098)
+#write.csv(vegs$variables_10098, file="NEON_VegStructure_VariableList.csv", row.names = FALSE)
 #Gives description for each table
 View(vegs$readme_10098)
 ```
  
  
-Saving dataframes from downloaded list
-```{r}
+Saving dataframes from object tables  
+```{r, slecting tables}
 #woody plant biomass & productivity 
 woody = vegs$vst_apparentindividual
 #write.csv(woody, "NEON_Woody_VegStructure_selectsites2018.csv", row.names = FALSE)
@@ -52,7 +51,173 @@ woody = vegs$vst_apparentindividual
 #non-woody plant (non-herbaceous perennial) biomass & productivity 
 nonwoody = vegs$`vst_non-woody`
 #write.csv(nonwoody, "NEON_NonWoody_VegStructure_selectsites2018.csv", row.names = FALSE)
+
+#table for taxonomic info
+maptag = vegs$vst_mappingandtagging
 ```
+
+
+Looking into the `woody` data
+```{r}
+#structure of variables
+str(woody)
+#dataframe dimension
+dim(woody)
+#name of columns
+names(woody)
+```
+
+Looking into `nonwoody`  
+```{r}
+#structure of variables
+str(nonwoody)
+#dataframe dimensions
+dim(nonwoody)
+#name of columns
+names(nonwoody)
+```
+
+Looking into `maptag`  
+```{r}
+#structure of variables
+str(maptag)
+#dataframe dimensions
+dim(maptag)
+#name of columns
+names(maptag)
+```
+
+# Cleaning
+Remove duplicates in the data & see what common fields `woody` and `maptag` share
+```{r, remove duplicates}
+#drop IUD as that will be unique for duplicate records
+woody_noUID = select(woody, -(uid))
+maptag_noUID = select(maptag, -(uid))
+
+#remove duplicates 
+woody_noD = distinct(woody_noUID)
+dim(woody)
+dim(woody_noD)
+
+maptag_noD = distinct(maptag_noUID)
+dim(maptag)
+dim(maptag_noD)
+
+#pull overlapping column names
+intersect(names(woody_noD), names(maptag_noD))
+```
+
+
+Some column values have unique values and we want to keep those distinct and not 
+join them so we will rename them.
+```{r, renaming columns}
+maptag_noD = rename(maptag_noD, 
+                    date_map=date, remarks_map=remarks, 
+                    recordedBy_map=recordedBy, measuredBy_map=measuredBy, 
+                    dataQF_map=dataQF, publicationDate_map=publicationDate)
+```
+
+
+# Join Dataframes  
+Now we can join the two data frames on all the variables with the same name. We 
+use a `left_join()` from the `dpylr` package in `tidyverse` because we want to 
+match all the rows from the "left" (first) dataframe to any rows that also occur 
+in the "right" (second) dataframe.  
+```{r}
+wood_vegstr = left_join(maptag_noD, woody_noD,
+                        by=c("namedLocation", "eventID", "domainID", "siteID", 
+                             "plotID", "individualID", "release"))
+```
+
+```{r, data specs}
+dim(wood_vegstr)
+names(wood_vegstr)
+```
+
+
+Let's save the cleaned joined dataset
+```{r, export}
+#exports as csv file
+write.csv(wood_vegstr, file="Output_202306/Wood_VegStructure_selectSites_2018_noDups.csv", row.names = FALSE)
+#saves the object as an .RDdata file (compressed dataframe)
+save(wood_vegstr, file = "Output_202306/wood_vegstr2018.RData")
+```
+
+
+Now let's just filter for a specific site (for in-person week) and see the 
+amount of plots in there.
+
+What do the plots look like?
+```{r}
+sort(unique(wood_vegstr[wood_vegstr$siteID=="MLBS",]$plotID))
+#unique(wood_vegstr[wood_vegstr$siteID=="MLBS",]$subplotID)
+#unique(wood_vegstr[wood_vegstr$siteID=="MLBS",]$nestedSubplotID)
+names(wood_vegstr)
+```
+
+Subset for MLBS only
+```{r}
+mlbs_wood = wood_vegstr %>%
+  filter(siteID=="MLBS")
+unique(mlbs_wood$siteID)
+```
+
+# Structural diversity metrics: basal area  
+
+We will want to calculate basal area using the `stemDiameter` as a metric of 
+structural diversity as a relative abundance for each species in a plot/site
+```{r}
+unique(mlbs_wood$stemDiameter)
+mlbs_wood %>%
+  count(stemDiameter)
+
+mlbs_wood %>%
+  count(taxonID)
+```
+
+Frequency of stem diameter
+```{r}
+hist(mlbs_wood$stemDiameter, xlab="Stem Diamter (cm)",
+     main="MLBS Stem Diameter")
+```
+
+
+Checking stats for each plot with respect to stemDiamter  
+```{r}
+library(mosaic, quietly = TRUE)
+
+favstats(stemDiameter~plotID, data=mlbs_wood)
+```
+
+
+Filtering for stemDiamter for greater than 10cm  
+```{r}
+mlbs_wood_lim = mlbs_wood %>%
+  filter(stemDiameter>=10)
+
+favstats(stemDiameter~plotID, data=mlbs_wood_lim)
+```
+
+
+Making a boxplot
+```{r}
+png(filename = "Output_202306/MLBS_StemDiameter.png", width=1050, height=800, units=)
+boxplot(mlbs_wood_lim$stemDiameter~mlbs_wood_lim$plotID, 
+        main="Plot Comparison at MLBS",
+        xlab="Plot ID",
+        ylab = "Stem Diamter (cm)")
+dev.off()
+```
+
+
+
+
+
+
+
+
+
+
 
 
 
