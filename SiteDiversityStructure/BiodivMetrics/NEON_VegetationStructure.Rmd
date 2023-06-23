@@ -162,7 +162,10 @@ mlbs_wood = wood_vegstr %>%
 unique(mlbs_wood$siteID)
 ```
 
-Calculate Basal Area
+# Structural diversity metrics: basal area  
+
+We will want to calculate basal area using the `stemDiameter` as a metric of 
+structural diversity as a relative abundance for each species in a plot/site
 ```{r}
 unique(mlbs_wood$stemDiameter)
 mlbs_wood %>%
@@ -172,6 +175,7 @@ mlbs_wood %>%
   count(taxonID)
 ```
 
+Frequency of stem diameter
 ```{r}
 hist(mlbs_wood$stemDiameter, xlab="Stem Diamter (cm)",
      main="MLBS Stem Diameter")
@@ -195,6 +199,15 @@ favstats(stemDiameter~plotID, data=mlbs_wood_lim)
 ```
 
 
+Making a boxplot
+```{r}
+png(filename = "Output_202306/MLBS_StemDiameter.png", width=1050, height=800, units=)
+boxplot(mlbs_wood_lim$stemDiameter~mlbs_wood_lim$plotID, 
+        main="Plot Comparison at MLBS",
+        xlab="Plot ID",
+        ylab = "Stem Diamter (cm)")
+dev.off()
+```
 
 
 
