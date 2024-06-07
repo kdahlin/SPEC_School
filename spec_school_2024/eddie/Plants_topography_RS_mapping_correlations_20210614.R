@@ -32,7 +32,7 @@ neon.points.sub <- subset(neon.points,
                           !is.na(neon.points$cor.R))
 
 # if you want to plot the whole extent of the NEON sites just do this
-# note that because some of the sites are very close to eachother, this can
+# note that because some of the sites are very close to each other, this can
 # look a bit messy
 #neon.points.sub <- neon.points
 
