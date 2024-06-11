@@ -16,6 +16,8 @@
 #
 # latest update: 20240610
 
+# I'm working on SPEC School today
+
 ################################################################################
 
 # this code takes leaf level N measurements and connects them to leaf level 
