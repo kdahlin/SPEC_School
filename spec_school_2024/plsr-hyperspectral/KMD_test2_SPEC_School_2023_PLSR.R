@@ -14,9 +14,7 @@
 # 2. Aaron Kamoske, PhD, when at MSU - kamoskea@msu.edu
 # 3. Adriana Uscanga, Alanna Post, Sandhya Sharma, Tony Bowman (all MSU)
 #
-# latest update: 20240610
-
-# I'm working on SPEC School today
+# latest update: 20240611
 
 ################################################################################
 
