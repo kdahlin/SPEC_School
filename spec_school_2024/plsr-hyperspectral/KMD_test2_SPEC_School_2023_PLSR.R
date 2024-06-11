@@ -1,4 +1,4 @@
-################################################################################
+#################################################################################
 
 # Partial Least Squares Regression (PLSR) code for exploring leaf traits with 
 # hyperspectral data ***USING handheld spectra***
@@ -36,10 +36,10 @@ library(GGally)
 today <- format(Sys.time(), "%Y%m%d")
 
 # directory where you want to store/write stuff
-home.dir <- "K:/SPEC_School_2024/"
+home.dir <- "Y:/"
 
 # HPCC directory where data is stored
-hpcc.dir <- "Z:/shared_data/foliar_chemistry/2023_SPEC_School/"
+hpcc.dir <- "Z:/shared_data/foliar_chemistry/2023_SPEC_School"
 
 # set this as our working directory so we can easily pull in data
 setwd(hpcc.dir)
