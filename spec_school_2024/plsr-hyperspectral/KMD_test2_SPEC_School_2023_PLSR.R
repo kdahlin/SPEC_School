@@ -16,8 +16,6 @@
 #
 # latest update: 20240610
 
-# I'm working on SPEC School today
-
 ################################################################################
 
 # this code takes leaf level N measurements and connects them to leaf level 
@@ -32,21 +30,28 @@ library(prospectr)
 library(smoother)
 library(GGally)
 
+# set seed to confirm script runs correctly
+set.seed(123)
+
 #todays date
 today <- format(Sys.time(), "%Y%m%d")
 
 # directory where you want to store/write stuff
-home.dir <- "K:/SPEC_School_2024/"
+# home.dir <- "K:/SPEC_School_2024/"
+home.dir <- '/Users/sestockman/Desktop/Spec School 2024'
 
 # HPCC directory where data is stored
-hpcc.dir <- "Z:/shared_data/foliar_chemistry/2023_SPEC_School/"
+# hpcc.dir <- "Z:/shared_data/foliar_chemistry/2023_SPEC_School/"
+hpcc.dir <- '/Volumes/rs-016/ersamlab/shared_data/foliar_chemistry/2023_SPEC_School/'
 
 # set this as our working directory so we can easily pull in data
 setwd(hpcc.dir)
 
 #lets set up an output directory
 dir.create(paste0(home.dir, "/N_practice_2023"))
-dir.create(paste0(home.dir, "/N_practice_2023/outputFiles_", today, "_SCRATCH"))
+dir.create(paste0(home.dir, "/N_practice_2023/outputFiles_", today, "_SCRATCH")) 
+# Note: 'Scratch' is a common file naming convention for intermidiate data/outputs
+# then have another file folder that is for final outputs/data
 
 # so we can point to it later ->
 out.dir <- paste0(home.dir, "/N_practice_2023/outputFiles_", today, "_SCRATCH/")
@@ -186,7 +191,7 @@ spectra.test.data <- test.data[,3:ncol(test.data)]
 n.test.data <- test.data[,1:2]
 
 ################################################################################
-#lets set up our data for PLSR
+# set up our data for PLSR
 ################################################################################
 
 #first lets set some options inside the pls package
@@ -203,7 +208,7 @@ plsr.dataset <- data.frame(leaf.N = n.training.data$nitrogen,
                            spectra = I(as.matrix(spectra.training.data)))
 
 ################################################################################
-#lets take a look at the correlations between the spectra and the biochem data
+# look at the correlations between the spectra and the biochem data
 ################################################################################
 
 # lets take a quick look at the correlations between the spectra and biochemical 
@@ -237,7 +242,7 @@ write.csv(spectra.cor.df, paste0(out.dir, in.var, '_Spectra_Correlations.csv',
           row.names = TRUE)
 
 ################################################################################
-#lets do a jackknife test to find the number of components to include in our 
+# do jackknife test to find the number of components to include in our 
 # PLSR model (this will take a few minutes to run)
 ################################################################################
 
@@ -248,7 +253,7 @@ iterations <- 50
 prop <- 0.80
 
 #lets create an empty matrix to store our results in
-jk.out <- matrix(data = NA, nrow = iterations, ncol = n.comps) 
+jk.out <- matrix(data = NA, nrow = iterations, ncol = n.comps) # jack knife test to decide number of components
 
 #lets start a timer to see how long this takes to run
 start.time <- Sys.time()
@@ -261,14 +266,15 @@ for (i in 1:iterations) {
   
   #lets take a sample from our dataset to test this on
   rows <- sample(1:nrow(plsr.dataset), floor(prop*nrow(plsr.dataset)))
-  sub.data <- plsr.dataset[rows,]
+  sub.data <- plsr.dataset[rows,] # only taking out 80%
   
-  #lets run our PLSR model now
+  #lets run our PLSR model now 
   plsr.out <- plsr(as.formula(paste(in.var,"~","spectra")), scale = FALSE, 
-                   ncomp = n.comps, validation = "LOO",
+                   ncomp = n.comps, 
+                   validation = "LOO", # has leave one out validation
                    trace = TRUE, data = sub.data)
   
-  #lets save our press statistic in our empty matrix
+  #lets save our press statistic in our empty matrix to evaluate model fit
   resPRESS <- as.vector(plsr.out$validation$PRESS)
   jk.out[i,seq(plsr.out$validation$ncomp)] = resPRESS
 }
@@ -304,8 +310,8 @@ boxplot(pressDFres$value ~ pressDFres$variable,
 # We can do this with a simple T-Test - a smaller PRESS statistic is better. so 
 # lets see where this starts to vary. we want the lowest number of components so
 # that we don't over predict our model.
-loc.1 <- 2
-loc.2 <- 3
+loc.1 <- 3
+loc.2 <- 4
 ttest <- t.test(pressDFres$value[which(pressDFres$variable == loc.1)], 
                 pressDFres$value[which(pressDFres$variable == loc.2)])
 
