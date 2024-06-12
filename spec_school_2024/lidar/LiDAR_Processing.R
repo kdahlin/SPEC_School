@@ -1,10 +1,11 @@
-##########################################################################################
-# This code will process NEON LiDAR data into a host of different RData and Raster files
+################################################################################
+# This code will process NEON LiDAR data into a host of different RData and 
+# Raster files
 
 # Code written by Aaron Kamoske - kamoskea@msu.edu - Summer 2019
 
 # Revised by Tony Bowman - bowman84@msu.edu - Fall 2023 
-##########################################################################################
+################################################################################
 
 #let's load the necessary libraries
 library(terra)
@@ -13,16 +14,19 @@ library(sf)
 library(plyr)
 library(tidyverse)
 
-#-----------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # First some basics
-#-----------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 #set the file path - CHANGE THIS TO MATCH YOUR MAPPED HPCC DRIVE
-laz.files <- "X:/shared_data/NEON_AOP_data/MLBS/2022/lidar_pointcloud_2022/"
+laz.files <- "Z:/shared_data/NEON_AOP_data/MLBS/2022/lidar_pointcloud_2022/"
 
 #set a prefix for the rasters we'll generate and a home directory the save files to 
 ## EXAMPLE - Replace with your own home directory but keep the "/MLBS_" file prefix ##
-wd <- "C:/Users/tonyb/OneDrive - Michigan State University/SPECSCHOOL/LiDAR/MLBS_"
+wd <- "K:/SPEC_School_2024/"
+
+# make a directory for output
+dir.create(paste0(wd, "lidar_output_MLBS_2022"))
 
 #list all the files in the path
 laz.files.list <- list.files(laz.files, pattern=c("\\.laz$|.las$"), full.names = TRUE)
@@ -30,6 +34,9 @@ laz.files.list <- list.files(laz.files, pattern=c("\\.laz$|.las$"), full.names =
 #get rid of any files that are less than 500kb
 laz.files.list <- laz.files.list[sapply(laz.files.list, file.size) > 500000]
 
+# how many are left? (we only downloaded the four tiles surrounding the Bio
+# Station for MLBS in 2022)
+length(laz.files.list)
 
 #-----------------------------------------------------------------------------------------
 # Let's process each LiDAR tile individually 
@@ -57,11 +64,15 @@ lad.raster <- lad.array.to.raster.stack.2(lad.array = lad.estimates,
                                           laz.array = laz.data,
                                           epsg.code = 32617)
   
-# We should remove the bottom 5 meters of LAD data to match everything else before calculating LAI
+# We should remove the bottom 5 meters of LAD data to match everything else 
+# before calculating LAI
 lad.raster.5 <- subset(lad.raster, 5:nlyr(lad.raster)) 
 
 # Create a single LAI raster from the LAD raster stack
 lai.raster <- terra::app(lad.raster.5, fun = sum, na.rm = TRUE)
+
+## take a look!
+plot(lai.raster, col=map.pal("viridis"))
     
 # Convert the list of LAZ arrays into a ground and canopy height raster
 grd.can.rasters <- array.to.ground.and.canopy.rasters.2(laz.array = laz.data,
@@ -108,7 +119,8 @@ can.volume <- canopy.volume.2(lad.array = lad.estimates,
                                 z.res = 1,
                                 epsg.code = 32617)
 
-# We can calculate the depth of the euphotic zone by dividing by the volume of the voxel
+# We can calculate the depth of the euphotic zone by dividing by the volume of 
+# the voxel
 euphotic.depth <- can.volume$euphotic.volume.column.raster / ( 5 * 5 * 1)
  
 # #-----------------------------------------------------------------------------------------
@@ -121,124 +133,170 @@ file.name <- laz.files.list[i]
 tile.numb <- strsplit(file.name, "_")[[1]][10:11]
 
 #laz array
-save(laz.data, file = paste0(wd, tile.numb[1], "_", tile.numb[2], "_laz_array.RData"))
+save(laz.data, 
+     file = paste0(wd, tile.numb[1], "_", tile.numb[2], "_laz_array.RData"))
                                  
 
 # lad raster stack
-terra::writeRaster(lad.raster.5, filename = paste0(wd, tile.numb[1], "_", tile.numb[2] , "_lad.tif"),
-                                                    filetype = "GTiff", overwrite = TRUE)
+terra::writeRaster(lad.raster.5, 
+                   filename = paste0(wd, tile.numb[1], "_", tile.numb[2] , 
+                                     "_lad.tif"),
+                   filetype = "GTiff", overwrite = TRUE)
                            
                
 #lai raster
-terra::writeRaster(lai.raster, filename = paste0(wd, tile.numb[1], "_", tile.numb[2], "_lai.tif"),
-                                                    filetype = "GTiff", overwrite = TRUE)
+terra::writeRaster(lai.raster, 
+                   filename = paste0(wd, tile.numb[1], "_", tile.numb[2], 
+                                     "_lai.tif"),
+                   filetype = "GTiff", overwrite = TRUE)
                                              
 
 #ground raster
-terra::writeRaster(grd.can.rasters[[1]], filename = paste0(wd, tile.numb[1], "_", tile.numb[2], "_dtm.tif"),
-                                                               filetype = "GTiff", overwrite = TRUE)
+terra::writeRaster(grd.can.rasters[[1]], 
+                   filename = paste0(wd, tile.numb[1], "_", tile.numb[2], 
+                                     "_dtm.tif"),
+                   filetype = "GTiff", overwrite = TRUE)
 
 
 #canopy raster
-terra::writeRaster(grd.can.rasters[[2]], filename = paste0(wd, tile.numb[1], "_", tile.numb[2], "_dsm.tif"),
-                                                                filetype = "GTiff", overwrite = TRUE)                 
+terra::writeRaster(grd.can.rasters[[2]], 
+                   filename = paste0(wd, tile.numb[1], "_", tile.numb[2], 
+                                     "_dsm.tif"),
+                  filetype = "GTiff", overwrite = TRUE)                 
 
 
 #chm raster
-terra::writeRaster(grd.can.rasters$chm.raster, filename = paste0(wd, tile.numb[1], "_", tile.numb[2], "_chm.tif"),
-                                                                filetype = "GTiff", overwrite = TRUE)             
+terra::writeRaster(grd.can.rasters$chm.raster, 
+                   filename = paste0(wd, tile.numb[1], "_", tile.numb[2], 
+                                     "_chm.tif"),
+                   filetype = "GTiff", overwrite = TRUE)             
                
 
 #max LAD raster
-terra::writeRaster(max.lad[[1]], filename = paste0(wd, tile.numb[1], "_", tile.numb[2], "_maxlad.tif"),
-                                                               filetype = "GTiff", overwrite = TRUE)       
+terra::writeRaster(max.lad[[1]], 
+                   filename = paste0(wd, tile.numb[1], "_", tile.numb[2], 
+                                     "_maxlad.tif"),
+                   filetype = "GTiff", overwrite = TRUE)       
             
 
 
 #height of max LAD raster
-terra::writeRaster(max.lad[[2]], filename = paste0(wd, tile.numb[1], "_", tile.numb[2], "_maxladheight.tif"),
-                                                              filetype = "GTiff", overwrite = TRUE)                                       
+terra::writeRaster(max.lad[[2]], 
+                   filename = paste0(wd, tile.numb[1], "_", tile.numb[2], 
+                                     "_maxladheight.tif"),
+                   filetype = "GTiff", overwrite = TRUE)                                       
               
 
 #filled voxel ratio raster
-terra::writeRaster(empty.filled.ratio[[1]], filename = paste0(wd, tile.numb[1], "_", tile.numb[2], "_filledvoxelratio.tif"),
-                                                              filetype = "GTiff", overwrite = TRUE)                                      
+terra::writeRaster(empty.filled.ratio[[1]], 
+                   filename = paste0(wd, tile.numb[1], "_", tile.numb[2], 
+                                     "_filledvoxelratio.tif"),
+                   filetype = "GTiff", overwrite = TRUE)                                      
 
 
 #porosity voxel ratio raster
-terra::writeRaster(empty.filled.ratio[[2]], filename = paste0(wd, tile.numb[1], "_", tile.numb[2], "_porosityratio.tif"),
-                                                              filetype = "GTiff", overwrite = TRUE)
+terra::writeRaster(empty.filled.ratio[[2]], 
+                   filename = paste0(wd, tile.numb[1], "_", tile.numb[2], 
+                                     "_porosityratio.tif"),
+                   filetype = "GTiff", overwrite = TRUE)
 
     
 
 #standard deviation of LAD within a column 
-terra::writeRaster(within.can.rugosity[[2]], filename = paste0(wd, tile.numb[1], "_", tile.numb[2], "_sdladcolumn.tif"),
-                                                              filetype = "GTiff", overwrite = TRUE)
+terra::writeRaster(within.can.rugosity[[2]], 
+                   filename = paste0(wd, tile.numb[1], "_", tile.numb[2], 
+                                     "_sdladcolumn.tif"),
+                   filetype = "GTiff", overwrite = TRUE)
                                                                           
 
 
 #height of lad at 10th quantile
-terra::writeRaster(ht.quantiles[[1]], filename = paste0(wd, tile.numb[1], "_", tile.numb[2], "_quantile10.tif"),
-                                                              filetype = "GTiff", overwrite = TRUE)
+terra::writeRaster(ht.quantiles[[1]], 
+                   filename = paste0(wd, tile.numb[1], "_", tile.numb[2], 
+                                     "_quantile10.tif"),
+                   filetype = "GTiff", overwrite = TRUE)
                                                                  
 
 #height of lad at 25th quantile
-terra::writeRaster(ht.quantiles[[2]], filename = paste0(wd, tile.numb[1], "_", tile.numb[2], "_quantile25.tif"),
-                                                              filetype = "GTiff", overwrite = TRUE)
+terra::writeRaster(ht.quantiles[[2]], 
+                   filename = paste0(wd, tile.numb[1], "_", tile.numb[2], 
+                                     "_quantile25.tif"),
+                   filetype = "GTiff", overwrite = TRUE)
                                                                 
 
 #height of lad at 50th quantile
-terra::writeRaster(ht.quantiles[[3]], filename = paste0(wd, tile.numb[1], "_", tile.numb[2], "_quantile50.tif"),
-                                                            filetype = "GTiff", overwrite = TRUE)
+terra::writeRaster(ht.quantiles[[3]], 
+                   filename = paste0(wd, tile.numb[1], "_", tile.numb[2], 
+                                     "_quantile50.tif"),
+                   filetype = "GTiff", overwrite = TRUE)
                                                                   
 
 #height of lad at 75th quantile
-terra::writeRaster(ht.quantiles[[4]], filename = paste0(wd, tile.numb[1], "_", tile.numb[2], "_quantile75.tif"),
-                                                            filetype = "GTiff", overwrite = TRUE)
+terra::writeRaster(ht.quantiles[[4]], 
+                   filename = paste0(wd, tile.numb[1], "_", tile.numb[2], 
+                                     "_quantile75.tif"),
+                   filetype = "GTiff", overwrite = TRUE)
 
                                                                    
 #height of lad at 90th quantile
-terra::writeRaster(ht.quantiles[[5]], filename = paste0(wd, tile.numb[1], "_", tile.numb[2], "_quantile90.tif"),
-                                                            filetype = "GTiff", overwrite = TRUE)
+terra::writeRaster(ht.quantiles[[5]], 
+                   filename = paste0(wd, tile.numb[1], "_", tile.numb[2], 
+                                     "_quantile90.tif"),
+                   filetype = "GTiff", overwrite = TRUE)
                                                                   
 
 #height of mean lad
-terra::writeRaster(ht.quantiles[[6]], filename = paste0(wd, tile.numb[1], "_", tile.numb[2], "_meanladheight.tif"),
-                                                            filetype = "GTiff", overwrite = TRUE)
+terra::writeRaster(ht.quantiles[[6]], 
+                   filename = paste0(wd, tile.numb[1], "_", tile.numb[2], 
+                                     "_meanladheight.tif"),
+                   filetype = "GTiff", overwrite = TRUE)
                                   
 
 #euphotic zone volume in a column
-terra::writeRaster(can.volume[[1]], filename = paste0(wd, tile.numb[1], "_", tile.numb[2], "_euphoticvolume.tif"),
-                                                           filetype = "GTiff", overwrite = TRUE)
+terra::writeRaster(can.volume[[1]], 
+                   filename = paste0(wd, tile.numb[1], "_", tile.numb[2], 
+                                     "_euphoticvolume.tif"),
+                   filetype = "GTiff", overwrite = TRUE)
                                                                             
 
 #euphotic zone total leaf area in a column
-terra::writeRaster(can.volume[[2]], filename = paste0(wd,tile.numb[1], "_", tile.numb[2], "_euphotictla.tif"),
-                                                           filetype = "GTiff", overwrite = TRUE)
+terra::writeRaster(can.volume[[2]], 
+                   filename = paste0(wd,tile.numb[1], "_", tile.numb[2], 
+                                     "_euphotictla.tif"),
+                   filetype = "GTiff", overwrite = TRUE)
                                                                          
 #depth of euphotic zone in a column
-terra::writeRaster(euphotic.depth, filename = paste0(wd, tile.numb[1], "_", tile.numb[2], "_euphoticdepth.tif"),
-                                                          filetype = "GTiff", overwrite = TRUE)
+terra::writeRaster(euphotic.depth, 
+                   filename = paste0(wd, tile.numb[1], "_", tile.numb[2], 
+                                     "_euphoticdepth.tif"),
+                   filetype = "GTiff", overwrite = TRUE)
                                                  
 
 #volume of oligophotic zone in a column
-terra::writeRaster(can.volume[[3]], filename = paste0(wd, tile.numb[1], "_", tile.numb[2], "_oligophoticvolume.tif"),
-                                                          filetype = "GTiff", overwrite = TRUE)
+terra::writeRaster(can.volume[[3]], 
+                   filename = paste0(wd, tile.numb[1], "_", tile.numb[2], 
+                                     "_oligophoticvolume.tif"),
+                   filetype = "GTiff", overwrite = TRUE)
                                                                                
 
 #oligophotic zone total leaf area in a column
-terra::writeRaster(can.volume[[4]], filename = paste0(wd, tile.numb[1], "_", tile.numb[2], "_oligophotictla.tif"),
-                                                          filetype = "GTiff", overwrite = TRUE)
+terra::writeRaster(can.volume[[4]], 
+                   filename = paste0(wd, tile.numb[1], "_", tile.numb[2], 
+                                     "_oligophotictla.tif"),
+                   filetype = "GTiff", overwrite = TRUE)
                                                                            
 
 #volume of empty space in a column
-terra::writeRaster(can.volume[[5]], filename = paste0(wd, tile.numb[1], "_", tile.numb[2], "_emptyvolume.tif"),
-                                                          filetype = "GTiff", overwrite = TRUE)
+terra::writeRaster(can.volume[[5]], 
+                   filename = paste0(wd, tile.numb[1], "_", tile.numb[2], 
+                                     "_emptyvolume.tif"),
+                   filetype = "GTiff", overwrite = TRUE)
                                                                         
 
 
 #let's do some visualization of our rasters using a palette of your choice
-#See the 'Details' section of https://rdrr.io/cran/terra/man/mappal.html for color palette options
+#See the 'Details' section of https://rdrr.io/cran/terra/man/mappal.html for 
+#color palette options
 
 ## EXAMPLE ##
 plot(within.canopy.rugosity, col=map.pal("viridis"))
