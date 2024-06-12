@@ -21,15 +21,17 @@ library(tidyverse)
 #set the file path - CHANGE THIS TO MATCH YOUR MAPPED HPCC DRIVE
 laz.files <- "Z:/shared_data/NEON_AOP_data/MLBS/2022/lidar_pointcloud_2022/"
 
-#set a prefix for the rasters we'll generate and a home directory the save files to 
-## EXAMPLE - Replace with your own home directory but keep the "/MLBS_" file prefix ##
+#set a prefix for the rasters we'll generate and a home directory the save files 
+#to EXAMPLE - Replace with your own home directory but keep the "/MLBS_" file 
+#prefix ##
 wd <- "K:/SPEC_School_2024/"
 
 # make a directory for output
 dir.create(paste0(wd, "lidar_output_MLBS_2022"))
 
 #list all the files in the path
-laz.files.list <- list.files(laz.files, pattern=c("\\.laz$|.las$"), full.names = TRUE)
+laz.files.list <- list.files(laz.files, pattern=c("\\.laz$|.las$"), 
+                             full.names = TRUE)
 
 #get rid of any files that are less than 500kb
 laz.files.list <- laz.files.list[sapply(laz.files.list, file.size) > 500000]
@@ -38,9 +40,9 @@ laz.files.list <- laz.files.list[sapply(laz.files.list, file.size) > 500000]
 # Station for MLBS in 2022)
 length(laz.files.list)
 
-#-----------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Let's process each LiDAR tile individually 
-#-----------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 # IMPORTANT: set i as the tile number from the list you want to process
 i <- 1
@@ -123,9 +125,9 @@ can.volume <- canopy.volume.2(lad.array = lad.estimates,
 # the voxel
 euphotic.depth <- can.volume$euphotic.volume.column.raster / ( 5 * 5 * 1)
  
-# #-----------------------------------------------------------------------------------------
+# #-----------------------------------------------------------------------------
 # # Lets write all the needed files to disc
-# #-----------------------------------------------------------------------------------------
+# #-----------------------------------------------------------------------------
 
 
 #some file output name prep
