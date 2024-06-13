@@ -1,5 +1,5 @@
 ################################################################################
-#test
+
 # Partial Least Squares Regression (PLSR) code for exploring leaf traits with 
 # hyperspectral data ***USING handheld spectra***
 
@@ -35,18 +35,21 @@ library(GGally)
 #todays date
 today <- format(Sys.time(), "%Y%m%d")
 
+set.seed(123)
 # directory where you want to store/write stuff
-home.dir <- "K:/SPEC_School_2024/"
+#home.dir <- "K:/SPEC_School_2024/"
+home.dir <- '/Users/benc/projects/spec/analysis/poc/pls'
 
 # HPCC directory where data is stored
-hpcc.dir <- "Z:/shared_data/foliar_chemistry/2023_SPEC_School/"
+hpcc.dir <- "/Volumes/ersamlab/shared_data/foliar_chemistry/2023_SPEC_School/"
+
 
 # set this as our working directory so we can easily pull in data
 setwd(hpcc.dir)
 
 #lets set up an output directory
-dir.create(paste0(home.dir, "/N_practice_2023"))
-dir.create(paste0(home.dir, "/N_practice_2023/outputFiles_", today, "_SCRATCH"))
+dir.create(paste0(home.dir, "/N_practice_2023"), showWarnings = FALSE)
+dir.create(paste0(home.dir, "/N_practice_2023/outputFiles_", today, "_SCRATCH"), showWarnings = FALSE)
 
 # so we can point to it later ->
 out.dir <- paste0(home.dir, "/N_practice_2023/outputFiles_", today, "_SCRATCH/")
@@ -55,9 +58,9 @@ out.dir <- paste0(home.dir, "/N_practice_2023/outputFiles_", today, "_SCRATCH/")
 # let's read in and clean up our data
 #-------------------------------------------------------------------------------
 
-field_data <- read.csv("MLBS_foliar_data_2023.csv")
-lab_data <- read.csv("solid_samples_MLBS_2-2-24.csv")
-spec_data <- read.csv("MLBS2023_SPEC_School_average_Spectra_20230623.csv")
+field_data <- read.csv(file.path(hpcc.dir,"MLBS_foliar_data_2023.csv"))
+lab_data <- read.csv(file.path(hpcc.dir,"solid_samples_MLBS_2-2-24.csv"))
+spec_data <- read.csv(file.path(hpcc.dir,"MLBS2023_SPEC_School_average_Spectra_20230623.csv"))
 
 View(field_data) #appears to be an issue with this data table, we'll fix this 
 #in the data wrangling chunk
@@ -232,9 +235,9 @@ abline(h = 0,lty = 2, lwd = 1.5, col = "grey80")
 #lets write this data to a csv so we can reference it later on if we need to
 spectra.cor.df <- data.frame(spectra.cor)
 names(spectra.cor.df) <- c("Correlation")
-write.csv(spectra.cor.df, paste0(out.dir, in.var, '_Spectra_Correlations.csv', 
-                                 sep = ""), 
-          row.names = TRUE)
+# write.csv(spectra.cor.df, paste0(out.dir, in.var, '_Spectra_Correlations.csv', 
+#                                  sep = ""), 
+#           row.names = TRUE)
 
 ################################################################################
 #lets do a jackknife test to find the number of components to include in our 
@@ -284,9 +287,9 @@ pressDF <- as.data.frame(jk.out)
 names(pressDF) <- as.character(seq(n.comps))
 
 #lets write this as a csv for later use
-write.csv(pressDF, file = paste0(out.dir, in.var, 
-                                 "_Jackkife_PLSR_Coefficients.csv"), 
-          row.names = FALSE)
+# write.csv(pressDF, file = paste0(out.dir, in.var, 
+#                                  "_Jackkife_PLSR_Coefficients.csv"), 
+#           row.names = FALSE)
 
 #lets melt the data for easier plotting
 pressDFres <- melt(pressDF)
@@ -317,7 +320,8 @@ ttest
 # two variables now. then lets go with the smaller value.
 # Now that we know the number of test components lets run our PLSR model again 
 # with that number of components.
-nComps <- 3
+#w/ set.seed()
+nComps <- 3 #benc: changed 3 -> 1 in the demo
 
 plsr.out <- plsr(as.formula(paste(in.var, "~", "spectra")), scale = FALSE,
                  ncomp = n.comps, validation = "LOO",
@@ -557,6 +561,6 @@ abline(0,1)
 box(lwd = 2)
 
 #lets write our results to a csv (if we like them)
-write.csv(leaf.n.output, file = paste0(out.dir,'PLSR_Leaf_N_Estimates.csv'), 
-          row.names = FALSE)
+# write.csv(leaf.n.output, file = paste0(out.dir,'PLSR_Leaf_N_Estimates.csv'), 
+#           row.names = FALSE)
 

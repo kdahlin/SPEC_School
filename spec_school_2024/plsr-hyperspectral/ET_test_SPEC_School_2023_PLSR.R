@@ -1,5 +1,5 @@
 ################################################################################
-#test
+
 # Partial Least Squares Regression (PLSR) code for exploring leaf traits with 
 # hyperspectral data ***USING handheld spectra***
 
@@ -15,8 +15,6 @@
 # 3. Adriana Uscanga, Alanna Post, Sandhya Sharma, Tony Bowman (all MSU)
 #
 # latest update: 20240610
-
-# I'm working on SPEC School today
 
 ################################################################################
 
