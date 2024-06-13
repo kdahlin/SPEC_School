@@ -14,6 +14,8 @@ library(sf)
 library(plyr)
 library(tidyverse)
 
+source("Z:/shared_code/SPEC_School/canopyLazR_V2.R")
+
 #-------------------------------------------------------------------------------
 # First some basics
 #-------------------------------------------------------------------------------
