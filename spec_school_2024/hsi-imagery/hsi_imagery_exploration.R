@@ -7,7 +7,7 @@
 #install.packages("BiocManager")
 
 library(BiocManager)
-#BiocManager::install("rhdf5")
+BiocManager::install("rhdf5")
 
 library(rhdf5)
 library(terra)
@@ -20,7 +20,7 @@ today <- format(Sys.Date(), "%Y%m%d")
 loc <- "MLBS"
 
 # where to find stuff
-hsi.data.dir <- paste0("Z:/shared_data/NEON_AOP_data/MLBS/2022/NEON_refl-surf-",
+hsi.data.dir <- paste0("Y:/shared_data/NEON_AOP_data/MLBS/2022/NEON_refl-surf-",
                        "bidir-ortho-mosaic/NEON.D07.MLBS.DP3.30006.002.2022-09.",
                        "basic.20240530T173638Z.PROVISIONAL/")
 
@@ -28,10 +28,10 @@ hsi.data.dir <- paste0("Z:/shared_data/NEON_AOP_data/MLBS/2022/NEON_refl-surf-",
 hsi.files <- list.files(hsi.data.dir)
 
 # list all of the data types within the hdf5 (should be the same for all files)
-h5ls(file = paste0(hsi.data.dir, hsi.files[2]))
+h5ls(file = paste0(hsi.data.dir, hsi.files[3]))
 
 # get a list of wavelengths (should be the same for all files)
-wavelengths <- h5read(file = paste0(hsi.data.dir, hsi.files[2]),
+wavelengths <- h5read(file = paste0(hsi.data.dir, hsi.files[3]),
                       name = paste0(loc, 
                                     "/Reflectance/Metadata/Spectral_Data/Wavelength"))
 wave.count <- 1:length(wavelengths)
@@ -46,12 +46,12 @@ write.csv(out.waves,
           row.names = FALSE)
 
 # let's get the projection info too
-in.proj <- h5read(file = paste0(hsi.data.dir, hsi.files[2]),
+in.proj <- h5read(file = paste0(hsi.data.dir, hsi.files[3]),
                       name = paste0("/MLBS/Reflectance/Metadata/",
                       "Coordinate_System/EPSG Code"))
 
 # and let's fine the lower left easting and northing values
-in.info <- h5read(file = paste0(hsi.data.dir, hsi.files[2]),
+in.info <- h5read(file = paste0(hsi.data.dir, hsi.files[3]),
                   name = paste0("/MLBS/Reflectance/Metadata/",
                                 "Coordinate_System/Map_Info"))
 in.info.sep <- strsplit(in.info, ",")
@@ -65,7 +65,7 @@ ll.y <- as.numeric(in.info.sep[[1]][5])
 # find the red band
 red.index <- which(abs(wavelengths - 650) == min(abs(wavelengths - 650)))
 
-red.array <- h5read(file = paste0(hsi.data.dir, hsi.files[2]),
+red.array <- h5read(file = paste0(hsi.data.dir, hsi.files[3]),
                     name = "/MLBS/Reflectance/Reflectance_Data",
                     index = list(red.index, 1:1000, 1:1000))
 
@@ -77,7 +77,7 @@ red.rast <- rast(red.matrix,
 # now green
 green.index <- which(abs(wavelengths - 550) == min(abs(wavelengths - 550)))
 
-green.array <- h5read(file = paste0(hsi.data.dir, hsi.files[2]),
+green.array <- h5read(file = paste0(hsi.data.dir, hsi.files[3]),
                     name = "/MLBS/Reflectance/Reflectance_Data",
                     index = list(green.index, 1:1000, 1:1000))
 
@@ -89,7 +89,7 @@ green.rast <- rast(green.matrix,
 # now blue
 blue.index <- which(abs(wavelengths - 450) == min(abs(wavelengths - 450)))
 
-blue.array <- h5read(file = paste0(hsi.data.dir, hsi.files[2]),
+blue.array <- h5read(file = paste0(hsi.data.dir, hsi.files[3]),
                       name = "/MLBS/Reflectance/Reflectance_Data",
                       index = list(blue.index, 1:1000, 1:1000))
 
@@ -109,7 +109,7 @@ plotRGB(rgb.stack)
 # first we have to get a NIR layer
 nir.index <- which(abs(wavelengths - 750) == min(abs(wavelengths - 750)))
 
-nir.array <- h5read(file = paste0(hsi.data.dir, hsi.files[2]),
+nir.array <- h5read(file = paste0(hsi.data.dir, hsi.files[3]),
                      name = "/MLBS/Reflectance/Reflectance_Data",
                      index = list(nir.index, 1:1000, 1:1000))
 
