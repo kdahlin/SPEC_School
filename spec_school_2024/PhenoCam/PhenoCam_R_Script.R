@@ -3,7 +3,7 @@
 ## 
 ## 04/23/2021
 ##
-## Written by: Nautica Jones (jonesnt@warhawks.ulm.edu) & Meghan Blumstein (blumsteinm@gmail.com) 
+## Written by: Nautica Jones Harriott (nautica00jones@gmail.com) & Meghan Blumstein (blumsteinm@gmail.com) 
 ##
 ## Objective: To extract GCC data and bud burst dates from individual red oaks (Q. rubra) in phenocam images
 ##
