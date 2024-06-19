@@ -7,7 +7,10 @@ library(lidR)
 # we're not going to write anything today, so we can just set our working
 # directory to the HPCC - looking at the 2018 data because we have all of that
 # downloaded from NEON already
-setwd("Z:/shared_data/NEON_AOP_data/MLBS/2018/lidar/ClassifiedPointCloud/")
+
+#setwd("Z:/shared_data/NEON_AOP_data/MLBS/2018/lidar/ClassifiedPointCloud/")
+
+setwd("/Volumes/ersamlab/shared_data/NEON_AOP_data/MLBS/2018/lidar/ClassifiedPointCloud/")
 
 # let's look at the list of lidar tile names
 files <- list.files(".")
