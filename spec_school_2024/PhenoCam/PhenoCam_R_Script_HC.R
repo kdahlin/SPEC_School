@@ -1,14 +1,20 @@
+
+#Jahiya Clark 
 ##Source: https://www.neonscience.org/resources/learning-hub/tutorials/phenocam-api-intro
 
 install.packages("neonUtilities")
-install.packages("ggplot2")
-install.packages("dplyr") # For data manipulation
+
+# Install thePhenocampi package from the GitHub repo
+#if(!require(devtools)) install.packages('devtools')
+#devtools::install_github('bnasr/phenocamapi')
+
+# loading the package
+library(phenocamapi)
 library(ggplot2)
 library(dplyr)
 library(neonUtilities)
 library(dplyr)
 library(data.table)
-library(phenocamapi)
 library(lubridate)
 library(jpeg)
 
