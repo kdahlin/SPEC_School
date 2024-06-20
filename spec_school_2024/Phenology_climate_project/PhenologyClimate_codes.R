@@ -156,6 +156,25 @@ df_under_THP_gdd <- df_under_THP_gdd%>%
   select(-canopy_level, -verticalPosition)
 View(df_under_THP_gdd)
 
+###read Basant's par (micromoles per square meter per second) data
+PAR_over <- read.csv("Y:\\phenology\\data\\PAR_top.csv")
+PAR_under <- read.csv("Y:\\phenology\\data\\PAR_ground.csv")
+View(PAR_over)
+View(PAR_under)
+
+# join the table
+df_over_THPGP <- left_join(df_over_THP_gdd, PAR_over, by = "date")
+View(df_over_THPGP)
+
+df_under_THPGP <- left_join(df_under_THP_gdd, PAR_under, by = "date")
+View(df_under_THPGP)
+
+##save
+setwd("Y:\\phenology\\data\\")
+# Save the data frame to a CSV file
+write.csv(df_over_THPGP, file = "Overstory_df.csv", row.names = FALSE)
+write.csv(df_under_THPGP, file = "understory_df.csv", row.names = FALSE)
+
 ##########################################################################################
 ####Hanshi will process the table ground trait data ############################
 ##########################################################################################
@@ -214,4 +233,40 @@ MLBS_intensity <- MLBS_Gphenology$phe_statusintensity
 # join the phe_perindividual and phe_statusintensity based on individual ID
 MLBS_combined <- left_join(MLBS_perindividual, MLBS_intensity, by = "individualID")
 View(MLBS_combined)
+
+
+##check the phenophase of ground phenology data
+table(MLBS_combined$phenophaseName)
+table(MLBS_combined$phenophaseIntensity)
+##extract the doy of "fallingleave" and "open flowers"
+Site_leaf <-   MLBS_combined %>% 
+  filter(phenophaseName == "Leaves")
+Site_leaf_yes <- Site_leaf %>% 
+  filter(phenophaseStatus == "yes")
+Site_leaf_50 <- Site_leaf_yes %>% 
+  filter(phenophaseIntensity == ">= 95%")
+View(Site_leaf_50)
+
+
+Site_fallingleave <-   Site_combined_indi_inten %>% 
+  filter(phenophaseName == "Leaves")
+Site_leave_yes <- Site_leave %>% 
+  filter(phenophaseStatus == "yes")
+Site_leave_50 <- Site_leave_yes %>% 
+  filter(phenophaseIntensity == "50-74%")
+
+# Site_buds <-   Site_combined_indi_inten %>% 
+#   filter(phenophaseName == "Breaking leaf buds")
+# Site_buds_yes <- Site_buds %>% 
+#   filter(phenophaseStatus == "yes")
+
+Site_phenology_summary <- Site_leave_50 %>%
+  group_by(siteID.x) %>%
+  summarize(
+    DOY_leaves = mean(dayOfYear, na.rm = TRUE)
+  ) %>%
+  select(siteID.x, DOY_leaves)
+
+Site_traits_phenology <- left_join(Site_phenology_summary, Site_trait_summary, by = "siteID.x")
+View(Site_traits_phenology)
 
