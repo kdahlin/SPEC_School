@@ -11,7 +11,7 @@ install.packages("hemispheR")
 library(hemispheR)
 library(tidyverse)
 
-filename <- '/Users/benc/projects/spec/data/hemi_photos/D07_0474.NEF'
+filename <- 'C:/Users/jahiy/Downloads/D07_9438.NEF'
 
 img <- import_fisheye(filename)
 
