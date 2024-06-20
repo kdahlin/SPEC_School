@@ -41,15 +41,17 @@ irbioAgg <- irbio %>%
 
 hpccPath <- '/Volumes/ersamlab/phenology/data'
 
-#Save top-of-canopy temperatures
+#Save bottom-of-canopy temperatures
 irbioAgg %>%
   filter(verticalPosition=='000') %>%
-  select(-verticalPosition) %>%
-  write_csv(file.path(hpccPath,'top_irbio_temperature.csv'))
+  mutate(canopy_level='bottom_of_canopy') %>%
+  select(canopy_level,everything()) %>%
+  write_csv(file.path(hpccPath,'bottom_irbio_temperature.csv'))
 
 #Save top-of-canopy temperatures
 irbioAgg %>%
   filter(verticalPosition=='040') %>%
-  select(-verticalPosition) %>%
-  write_csv(file.path(hpccPath,'bottom_irbio_temperature.csv'))
+  mutate(canopy_level='top_of_canopy') %>%
+  select(canopy_level,everything()) %>%
+  write_csv(file.path(hpccPath,'top_irbio_temperature.csv'))
   
