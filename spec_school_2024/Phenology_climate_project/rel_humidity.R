@@ -15,7 +15,7 @@ relhum <- loadByProduct(dpID="DP1.00098.001", site="MLBS",
 
 View(relhum)
 
-list2env(irbioPkg, .GlobalEnv)
+list2env(relhum, .GlobalEnv)
 
 View(RH_30min)
 
