@@ -27,53 +27,73 @@ precip_data <- loadByProduct(
   package="basic", timeIndex="30",
   check.size = FALSE
 )
-
-
 View(precip_data)
-
 list2env(precip_data, .GlobalEnv)
+
+# Load top-of canopy data 
+# secondary represents top of canopy while throughfall represents understory
 View(SECPRE_30min)
 SECPRE <- as_tibble(SECPRE_30min)
-unique(RH$verticalPosition) #Check what vertical positions are available
+unique(SECPRE$verticalPosition) #Check what vertical positions are available
 
-RHAgg <- RH %>%
-  filter(verticalPosition %in% c('000','060') &
-           RHFinalQF==0 &
-           !is.na(RHMean)) %>%
+SECPREAgg <- SECPRE %>%
+  filter(verticalPosition %in% c('060') &
+           secPrecipRangeQF==0 &
+           !is.na(secPrecipBulk)) %>%
   mutate(date=as.Date(startDateTime)) %>%
   group_by(verticalPosition,date) %>%
   summarize(
-    RH_mean=mean(RHMean),
-    RH_min=min(RHMean),
-    RH_max=max(RHMean)
+    SecPrecip_mean=mean(secPrecipBulk),
+    SecPrecip_min=min(secPrecipBulk),
+    SecPrecip_max=max(secPrecipBulk)
   ) %>%
   ungroup %>%
   arrange(verticalPosition,date)
+hpccPath <- 'Z:/phenology/data'
+
+#Save top-of-canopy precipitation
+SECPREAgg %>%
+  filter(verticalPosition=='060') %>%
+  select(-verticalPosition) %>%
+  write.csv(file.path(hpccPath,'top_Precip.csv'))
+
+#Load understory precipitation data
+View(THRPRE_30min)
+THRPRE <- as_tibble(THRPRE_30min)
+unique(THRPRE$verticalPosition) #Check what vertical positions are available
+
+THRPREAgg <- THRPRE %>%
+  filter(verticalPosition %in% c('000') &
+           TFPrecipRangeQF==0 &
+           !is.na(TFPrecipBulk)) %>%
+  mutate(date=as.Date(startDateTime)) %>%
+  group_by(verticalPosition,date) %>%
+  summarize(
+    TFPrecip_mean=mean(TFPrecipBulk),
+    TFPrecip_min=min(TFPrecipBulk),
+    TFPrecip_max=max(TFPrecipBulk)
+  ) %>%
+  ungroup %>%
+  arrange(verticalPosition,date)
+hpccPath <- 'Z:/phenology/data'
+
+#Save throughfall(Understory) precipitation
+THRPREAgg %>%
+  filter(verticalPosition=='000') %>%
+  select(-verticalPosition) %>%
+  write.csv(file.path(hpccPath,'under_Precip.csv'))
 
 
 
 
 
 
-# Extract relevant data from the list
-precip_data_extracted <- precip_data$SECPRE_30min
 
 
-list2env()
-# Check the structure of the extracted data
-str(precip_data_extracted)
 
-# Ensure the data is not NULL
-if (is.null(precip_data_extracted)) stop("Precipitation data not found")
 
-# Assuming the relevant columns are 'startDateTime' and 'priPrecipBulk'
-daily_precip <- precip_data_extracted %>%
-  mutate(date = as_date(startDateTime)) %>%
-  group_by(date) %>%
-  summarize(daily_precip = sum(priPrecipBulk, na.rm = TRUE)) %>%
-  ungroup()
 
-write.csv(daily_precip, "daily_precip_2018_2022.csv", row.names = FALSE)
+
 
 
 
