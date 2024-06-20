@@ -3,7 +3,7 @@ install.packages("ggplot2")
 install.packages("dplyr")
 install.packages("lubridate")
 install.packages("tidyr")
-install.packages("plotly")
+#install.packages("plotly")
 
 # Load required libraries
 library(neonUtilities)  # for accessing NEON data
