@@ -8,7 +8,6 @@ library(jpeg)
 
 setwd("E:\\Prof. Qiu Lab\\2024SPECschool\\SPEC_School\\spec_school_2024\\Phenology_climate_project")
 
-#####test for pull, commitxxxxx
 ####Hanshi will process the PhenoCam data (time series: 1 day)
 ####The time covers 2018-2022
 ##obtain the phenoCam data of MLBS (understory and overstory)
@@ -24,6 +23,8 @@ View(MLBS_over_DB_2000)
 # Remove columns that contain only NA values
 MLBS_under_UN_1000 <- MLBS_under_UN_1000 %>%
   select_if(~ !all(is.na(.)))
+MLBS_over_DB_2000 <- MLBS_over_DB_2000 %>%
+  select_if(~ !all(is.na(.)))
 
 # Define the column names
 colnames(MLBS_under_UN_1000) <-   c("date", "local_std_time", "doy", "filename",
@@ -35,22 +36,53 @@ colnames(MLBS_under_UN_1000) <-   c("date", "local_std_time", "doy", "filename",
                                                 "g_75_qtl","g_90_qtl","g_95_qtl","b_mean","b_std",
                                                 "b_5_qtl","b_10_qtl","b_25_qtl","b_50_qtl",	"b_75_qtl",
                                                 "b_90_qtl","b_95_qtl","r_g_correl","g_b_correl","b_r_correl")
+colnames(MLBS_over_DB_2000) <-   c("date", "local_std_time", "doy", "filename",
+                                    "solar_elev", "exposure", "awbflag", "mask_index",
+                                    "gcc", "rcc", "r_mean",	"r_std",
+                                    "r_5_qtl","r_10_qtl",	"r_25_qtl",	"r_50_qtl",
+                                    "r_75_qtl","r_90_qtl","r_95_qtl", "g_mean",
+                                    "g_std","g_5_qtl","g_10_qtl","g_25_qtl","g_50_qtl",
+                                    "g_75_qtl","g_90_qtl","g_95_qtl","b_mean","b_std",
+                                    "b_5_qtl","b_10_qtl","b_25_qtl","b_50_qtl",	"b_75_qtl",
+                                    "b_90_qtl","b_95_qtl","r_g_correl","g_b_correl","b_r_correl")
+
 # Convert the date column to Date type
 MLBS_under_UN_1000$date <- as.Date(MLBS_under_UN_1000$date, format="%Y-%m-%d")
+MLBS_over_DB_2000$date <- as.Date(MLBS_over_DB_2000$date, format="%Y-%m-%d")
+
 # Filter the data from 2018 to 2022
 filtered_under <- MLBS_under_UN_1000 %>%
   filter(date >= as.Date("2018-01-01") & date <= as.Date("2022-12-31"))
 View(filtered_under)
+filtered_over <- MLBS_over_DB_2000 %>%
+  filter(date >= as.Date("2018-01-01") & date <= as.Date("2022-12-31"))
+View(filtered_over)
 
 ##Aggregate the data with the same dates into mean value
 # Extract month and day from the date column
 filtered_under <- filtered_under %>%
-  mutate(month_day = format(date, "%m-%d"))
+  mutate(month_day_under = format(date, "%Y-%m-%d"))
 # Group by month and day and calculate the mean of the GCC column
 aggregated_under <- filtered_under %>%
-  group_by(month_day) %>%
+  group_by(month_day_under) %>%
   summarize(gcc = mean(gcc, na.rm = TRUE))
 View(aggregated_under)
+
+# Extract month and day from the date column
+filtered_over <- filtered_over %>%
+  mutate(month_day_over = format(date, "%Y-%m-%d"))
+# Group by month and day and calculate the mean of the GCC column
+aggregated_over <- filtered_over %>%
+  group_by(month_day_over) %>%
+  summarize(gcc = mean(gcc, na.rm = TRUE))
+View(aggregated_over)
+
+
+
+
+
+
+
 
 ##obtain the trait of MLBS
 MLBS_trait <- loadByProduct(dpID="DP1.10026.001", 
