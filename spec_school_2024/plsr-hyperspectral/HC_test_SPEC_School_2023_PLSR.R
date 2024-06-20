@@ -21,6 +21,10 @@
 # this code takes leaf level N measurements and connects them to leaf level 
 # spectral measurements using PLSR
 
+# install.packages("pls")
+# install.packages("prospectr")
+# install.packages("smoother")
+# install.packages("GGally")
 #load the needed libraries
 library(ggplot2)
 library(tidyverse)
@@ -34,10 +38,10 @@ library(GGally)
 today <- format(Sys.time(), "%Y%m%d")
 
 # directory where you want to store/write stuff
-home.dir <- "K:/SPEC_School_2024/"
+home.dir <- "E:\\Prof. Qiu Lab\\2024 SPEC school\\SPEC_School\\spec_school_2024"
 
 # HPCC directory where data is stored
-hpcc.dir <- "Z:/shared_data/foliar_chemistry/2023_SPEC_School/"
+hpcc.dir <- "Y:\\shared_data\\foliar_chemistry\\2023_SPEC_School"
 
 # set this as our working directory so we can easily pull in data
 setwd(hpcc.dir)
