@@ -1,14 +1,20 @@
+
+#Jahiya Clark 
 ##Source: https://www.neonscience.org/resources/learning-hub/tutorials/phenocam-api-intro
 
 install.packages("neonUtilities")
-install.packages("ggplot2")
-install.packages("dplyr") # For data manipulation
+
+# Install thePhenocampi package from the GitHub repo
+#if(!require(devtools)) install.packages('devtools')
+#devtools::install_github('bnasr/phenocamapi')
+
+# loading the package
+library(phenocamapi)
 library(ggplot2)
 library(dplyr)
 library(neonUtilities)
 library(dplyr)
 library(data.table)
-library(phenocamapi)
 library(lubridate)
 library(jpeg)
 
@@ -31,3 +37,28 @@ View(MLBS33_DB_2000)
 MLBS33_DB_2000[,date:=as.Date(date)]
 # plot gcc_90 (vegetation indices)
 MLBS33_DB_2000[,plot(date, gcc_90, col = 'green', type = 'b')]
+
+under <- as_tibble(MLBS42_UN_1000)
+
+under %>%
+  mutate(year=as.factor(year)) %>%
+ggplot(aes(x=doy,y=gcc_90,color=year,group=year)) +
+  geom_line() +
+  theme_minimal()
+
+over <- as_tibble(MLBS33_DB_2000)
+
+over %>%
+  mutate(year=as.factor(year)) %>%
+  ggplot(aes(x=doy,y=gcc_90,color=year,group=year)) +
+  geom_line() +
+  theme_minimal()
+
+# plot over & understory in same year
+MLBS33_DB_2000$label = 'overstory'
+MLBS42_UN_1000$label = 'understory'
+dat <- rbind(MLBS33_DB_2000, MLBS42_UN_1000)
+
+ggplot(data=dat %>% filter(year>2017)) +
+  geom_point(aes(x=date, y=gcc_90, color=label)) +
+  facet_wrap(~year, scales='free_x')
