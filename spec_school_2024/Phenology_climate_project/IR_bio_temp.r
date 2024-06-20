@@ -13,6 +13,8 @@ irbioPkg <- loadByProduct(dpID="DP1.00005.001", site="MLBS",
                       package="basic", timeIndex="30",
                       check.size = F)
 
+saveRDS(irbioPkg,'/Users/benc/projects/spec/data/ir_bio_temp.rds')
+
 View(irbioPkg)
 
 list2env(irbioPkg, .GlobalEnv)
@@ -27,16 +29,15 @@ irbioAgg <- irbio %>%
   filter(verticalPosition %in% c('000','040') &
         finalQF==0 &
         !is.na(bioTempMean)) %>%
-  mutate(doy=yday(startDateTime),
-         year=year(startDateTime)) %>%
-  group_by(verticalPosition,year,doy) %>%
+  mutate(date=as.Date(startDateTime)) %>%
+  group_by(verticalPosition,date) %>%
   summarize(
     t_mean=mean(bioTempMean),
     t_min=min(bioTempMean),
     t_max=max(bioTempMean)
   ) %>%
   ungroup %>%
-  arrange(verticalPosition,year,doy)
+  arrange(verticalPosition,date)
 
 hpccPath <- '/Volumes/ersamlab/phenology/data'
 
