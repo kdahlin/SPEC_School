@@ -74,6 +74,7 @@ model = deepforestr::df_model()
 model$use_release()
 
 project_path <- '/Volumes/rs-016/ersamlab/hyperspec_id_group'
+
 # Define multiple directory levels and file name
 test_mlbs_image <- "2018_MLBS_3_541000_4140000_image_crop.tif"
 
@@ -82,8 +83,15 @@ file_path <- file.path(project_path, test_mlbs_image)
 
 # Print the full path
 print(file_path)
-
+test_rast <- terra::rast(file_path)
+plot(test_rast)
 
 image_path = get_data(file_path) # Gets a path to an example image
 bounding_boxes = model$predict_image(path=image_path, return_plot=FALSE)
 head(bounding_boxes)
+
+
+predicted_image = model$predict_image(path=image_path, return_plot=TRUE)
+plot(predicted_image[,,3:1]/255)
+predicted_rast <- terra::rast(predicted_image[,,3:1]/255)
+plot(predicted_rast)
