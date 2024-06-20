@@ -53,10 +53,8 @@ MLBS_over_DB_2000$date <- as.Date(MLBS_over_DB_2000$date, format="%Y-%m-%d")
 # Filter the data from 2018 to 2022
 filtered_under <- MLBS_under_UN_1000 %>%
   filter(date >= as.Date("2018-01-01") & date <= as.Date("2022-12-31"))
-View(filtered_under)
 filtered_over <- MLBS_over_DB_2000 %>%
   filter(date >= as.Date("2018-01-01") & date <= as.Date("2022-12-31"))
-View(filtered_over)
 
 ##Aggregate the data with the same dates into mean value
 # Extract month and day from the date column
@@ -76,7 +74,6 @@ aggregated_over <- filtered_over %>%
   group_by(month_day_over) %>%
   summarize(gcc = mean(gcc, na.rm = TRUE))
 View(aggregated_over)
-
 
 
 
