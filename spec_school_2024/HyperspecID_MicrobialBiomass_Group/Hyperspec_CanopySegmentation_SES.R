@@ -63,7 +63,7 @@ reticulate::conda_update() # TODO unsure if needed when running after everything
 # Load reticulate library
 library(reticulate)
 reticulate::use_condaenv("deepforest_env", required = TRUE)
-library('terra')
+library(terra)
 library(deepforestr)
 
 # Check if DeepForest can be imported
