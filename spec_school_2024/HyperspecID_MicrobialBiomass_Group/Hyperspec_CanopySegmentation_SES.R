@@ -73,7 +73,17 @@ py_run_string("import deepforest")
 model = deepforestr::df_model()
 model$use_release()
 
+project_path <- '/Volumes/rs-016/ersamlab/hyperspec_id_group'
+# Define multiple directory levels and file name
+test_mlbs_image <- "2018_MLBS_3_541000_4140000_image_crop.tif"
 
-image_path = get_data("OSBS_029.png") # Gets a path to an example image
+# Combine the base path, sub-directory, and file name
+file_path <- file.path(project_path, test_mlbs_image)
+
+# Print the full path
+print(file_path)
+
+
+image_path = get_data(file_path) # Gets a path to an example image
 bounding_boxes = model$predict_image(path=image_path, return_plot=FALSE)
 head(bounding_boxes)
