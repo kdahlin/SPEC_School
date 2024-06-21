@@ -76,16 +76,17 @@ model$use_release()
 project_path <- '/Volumes/rs-016/ersamlab/hyperspec_id_group'
 
 # Define multiple directory levels and file name
-test_mlbs_image <- "2018_MLBS_3_541000_4140000_image_crop.tif"
+test_input_mlbs_image <- "2018_MLBS_3_541000_4140000_image_crop.tif"
 
 # Combine the base path, sub-directory, and file name
-file_path <- file.path(project_path, test_mlbs_image)
+file_path <- file.path(project_path, test_input_mlbs_image)
 
 # Print the full path
 print(file_path)
 test_rast <- terra::rast(file_path)
 plot(test_rast)
 
+# predict IMAGE
 image_path = get_data(file_path) # Gets a path to an example image
 bounding_boxes = model$predict_image(path=image_path, return_plot=FALSE)
 head(bounding_boxes)
@@ -95,3 +96,11 @@ predicted_image = model$predict_image(path=image_path, return_plot=TRUE)
 plot(predicted_image[,,3:1]/255)
 predicted_rast <- terra::rast(predicted_image[,,3:1]/255)
 plot(predicted_rast)
+
+# predict TILE
+bounding_boxes = model$predict_tile(image_path, return_plot=FALSE)
+predicted_image = model$predict_tile(image_path, return_plot=TRUE, patch_size=300L, patch_overlap=0.25)
+predicted_rast <- terra::rast(predicted_image[,,3:1]/255)
+#plot predicted image as RGB
+terra::plotRGB(x = predicted_rast, r=2, g=3, b=1, stretch="lin")
+head(bounding_boxes)

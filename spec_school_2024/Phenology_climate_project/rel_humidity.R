@@ -51,3 +51,43 @@ RHAgg %>%
   select(-verticalPosition) %>%
   write_csv(file.path(hpccPath,'bottom_RH.csv'))
 
+
+
+# Plotting function
+plot_RH <- function(data, title) {
+  ggplot(data, aes(x = date)) +
+    geom_line(aes(y = RH_mean, color = 'Mean')) +
+    geom_line(aes(y = RH_min, color = 'Min')) +
+    geom_line(aes(y = RH_max, color = 'Max')) +
+    labs(
+      title = title,
+      x = 'Date',
+      y = 'Relative Humidity (%)',
+      color = 'Legend'
+    ) +
+    theme_minimal()
+}
+
+# Filter data for plotting
+top_RH <- RHAgg %>% filter(verticalPosition == '060')
+bottom_RH <- RHAgg %>% filter(verticalPosition == '000')
+
+# Create plots
+plot_top_RH <- plot_RH(top_RH, 'Top-of-Canopy Relative Humidity')
+plot_bottom_RH <- plot_RH(bottom_RH, 'Bottom-of-Canopy Relative Humidity')
+
+# Display plots separately
+plot_top_RH
+plot_bottom_RH
+
+install.packages("cowplot")
+
+# Combine the plots for comparison
+combined_plot <- cowplot::plot_grid(plot_top_RH, plot_bottom_RH, ncol = 1)
+
+# Save the combined plot as a high-quality PNG
+output_path <- file.path(hpccPath, 'combined_RH_plot.jpeg')
+ggsave(output_path, plot = combined_plot, width = 10, height = 8, dpi = 300)
+
+# Print the combined plot
+print(combined_plot)
