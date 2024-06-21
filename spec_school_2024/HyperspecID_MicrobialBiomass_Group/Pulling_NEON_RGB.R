@@ -32,8 +32,6 @@ byTileAOP(dpID= 'DP3.30006.001',
 
 
 
-
-
 # byTileAOP(): Downloads remote sensing data for the specified data product, subset to tiles that intersect a list of coordinates.
 
 zipsByProduct(dpID = product_code,
