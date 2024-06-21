@@ -6,7 +6,7 @@ library(phenocamapi)
 library(lubridate)
 library(jpeg)
 
-setwd("E:\\Prof. Qiu Lab\\2024SPECschool\\SPEC_School\\spec_school_2024\\Phenology_climate_project")
+setwd("Y:\\phenology\\data\\")
 
 ##########################################################################################
 ####Hanshi will process the PhenoCam data (time series: 1 day)############################
@@ -178,7 +178,6 @@ write.csv(df_under_THPGP, file = "understory_df.csv", row.names = FALSE)
 ##########################################################################################
 ####Hanshi will process the table ground trait data ############################
 ##########################################################################################
-
 ##obtain the trait of MLBS
 MLBS_trait <- loadByProduct(dpID="DP1.10026.001", 
                             site= "MLBS",
@@ -234,7 +233,6 @@ MLBS_intensity <- MLBS_Gphenology$phe_statusintensity
 MLBS_combined <- left_join(MLBS_perindividual, MLBS_intensity, by = "individualID")
 View(MLBS_combined)
 
-
 ##check the phenophase of ground phenology data
 table(MLBS_combined$phenophaseName)
 table(MLBS_combined$phenophaseIntensity)
@@ -243,30 +241,46 @@ Site_leaf <-   MLBS_combined %>%
   filter(phenophaseName == "Leaves")
 Site_leaf_yes <- Site_leaf %>% 
   filter(phenophaseStatus == "yes")
-Site_leaf_50 <- Site_leaf_yes %>% 
+Site_leaf_95 <- Site_leaf_yes %>% 
   filter(phenophaseIntensity == ">= 95%")
-View(Site_leaf_50)
+View(Site_leaf_95)
 
-
-Site_fallingleave <-   Site_combined_indi_inten %>% 
-  filter(phenophaseName == "Leaves")
-Site_leave_yes <- Site_leave %>% 
-  filter(phenophaseStatus == "yes")
-Site_leave_50 <- Site_leave_yes %>% 
-  filter(phenophaseIntensity == "50-74%")
-
-# Site_buds <-   Site_combined_indi_inten %>% 
-#   filter(phenophaseName == "Breaking leaf buds")
-# Site_buds_yes <- Site_buds %>% 
-#   filter(phenophaseStatus == "yes")
-
-Site_phenology_summary <- Site_leave_50 %>%
-  group_by(siteID.x) %>%
+table(Site_leaf_95$scientificName)
+Site_leaf_95$date.y
+Site_leaf_95$dayOfYear
+MLBS_leaf_summary <- Site_leaf_95 %>%
+  group_by(scientificName) %>%
   summarize(
-    DOY_leaves = mean(dayOfYear, na.rm = TRUE)
+    CollectionDate= mean(date.y, na.rm = TRUE),
+    DOY_leave = mean(dayOfYear, na.rm = TRUE)  # Assuming you want the first collection date
   ) %>%
-  select(siteID.x, DOY_leaves)
+  select(scientificName, 
+         DOY_leave,CollectionDate)
+View(MLBS_leaf_summary)
 
-Site_traits_phenology <- left_join(Site_phenology_summary, Site_trait_summary, by = "siteID.x")
-View(Site_traits_phenology)
+MLBS_trait_leaf <- left_join(MLBS_trait_summary, MLBS_leaf_summary, by = "scientificName")
+View(MLBS_trait_leaf)
+
+Site_flowering <-   MLBS_combined %>% 
+  filter(phenophaseName == "Open flowers")
+Site_flowering_yes <- Site_flowering %>% 
+  filter(phenophaseStatus == "yes")
+Site_flowering_95 <- Site_flowering_yes %>% 
+  filter(phenophaseIntensity == ">= 95%")
+
+Site_flowering_95$date.y
+Site_flowering_95$dayOfYear
+Site_flower_summary <- Site_flowering_95 %>%
+  group_by(scientificName) %>%
+  summarize(
+    DOY_flower = mean(dayOfYear, na.rm = TRUE)
+  ) %>%
+  select(scientificName, DOY_flower)
+View(Site_flower_summary)
+table(Site_flower_summary)
+
+Site_TLF <- left_join(MLBS_trait_leaf, Site_flower_summary, by = "scientificName")
+View(Site_TLF)
+
+write.csv(Site_TLF, file = "Trait_df.csv", row.names = FALSE)
 

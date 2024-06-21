@@ -3,19 +3,18 @@ library(terra)
 
 # read in leaf area scans at 150 dpi and calculating area
 
-setwd("D:/Users/kdahlin/Dropbox/NSF_CAREER_2021/SPEC_School/2023/field_data/")
+setwd("Z:/shared_data/NEON_field_data/MLBS/SPEC_School_2024/")
 
 
 # list all the leaf scan jpg files in the directory
 leaf.files <- list.files("leaf_scans/", 
-                        pattern = c("\\.jpg$"),
+                        pattern = c("\\.png$"),
                         full.names = TRUE)
 
 # make a data frame to write names to
 out.data <- as.data.frame(matrix(NA, nrow = length(leaf.files), ncol = 4))
 names(out.data) <- c("ID", "pixels", "area_cm2", "area_m2")
-out.data$ID[1:9] <- paste0("MLBS_00", 1:9)
-out.data$ID[10:length(leaf.files)] <- paste0("MLBS_0", 10:length(leaf.files))
+out.data$ID <- substr(leaf.files, 12, 20)
 
 # loop to read in each file and calculate area in cm2 and m2
 for (i in 1:length(leaf.files)) {
@@ -27,5 +26,5 @@ for (i in 1:length(leaf.files)) {
 }
 
 # write csv
-write.csv(out.data, "MLBS2023_SPEC_School_leaf_area.csv",
+write.csv(out.data, "MLBS2024_SPEC_School_leaf_area.csv",
           row.names = TRUE)
