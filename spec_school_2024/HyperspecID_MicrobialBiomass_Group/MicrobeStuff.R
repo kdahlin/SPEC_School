@@ -1,7 +1,7 @@
 #Script for analyzing NEON Soil Microbe Data
 rm(list=ls())
 
-# install.packages("neonUtilities")
+install.packages("neonUtilities")
 library(neonUtilities)
 library(geoNEON)
 library(tidyverse)
@@ -53,34 +53,25 @@ microb$variables_10104[grep("totalLipidConcentration", microb$variables_10104$fi
 
 microb$variables_10104[grep("coordinateUncertainty", microb$variables_10104$fieldName), c("description", "units")]
 
+# View the first few rows of the soil core table, which includes soil temperature
+
+head(soil$sls_soilCoreCollection)
 
 
-
-#Just the dataframe that has biomass
 biomass <- microb$sme_scaledMicrobialBiomass
 
-
-#relevant variables
 soil.loc1 <- soil.loc %>%
   select(adjDecimalLatitude, adjDecimalLongitude, adjEasting, adjNorthing, sampleID, sampleTiming, horizon, sampleTopDepth, sampleBottomDepth)
 
-#relevant variables
 biomass1 <- biomass %>%
   select(siteID, sampleID, plotID, collectDate, biomassID, correctedTotLipidConc)
 
-
-#join soil data and microbe data
 soilmicrobe <- left_join(soil.loc1, biomass1)
 
 
-#get rid of soil samples that ddidn't get microbed
 soilmicrobe.1 <- soilmicrobe[!is.na(soilmicrobe$correctedTotLipidConc),]
 
-
-#lets only look at peak green samples (June/July) to coincide w/ AOP data
 soilmicrobe.2 <- subset(soilmicrobe.1, sampleTiming == "peakGreenness")
-
-
 
 #Download hyperspectral data
 
@@ -124,9 +115,7 @@ spectra_traits_sub <- merge(spectra_top_black[spectra_top_black$wavelength == 35
 spectra_traits_sub[c("spectralSampleID","taxonID","stemDistance","stemAzimuth","adjEasting","adjNorthing","crownPolygonID")]
 
 
-# wd <- "/Volumes/home-030/f0108963/SPEC_School"
-
-wd <- '/Volumes/rs-016/ersamlab/hyperspec_id_group'
+wd <- "/Volumes/home-030/f0108963/SPEC_School"
 
 setwd(wd)
 
@@ -148,8 +137,8 @@ byTileAOP(dpID='DP3.30006.001',
 
 # Define the h5 file name to be opened
 
-h5_file <- paste0("/Volumes/home-030/f0108963/SPEC_School/DP3.30006.001/neon-aop-products/2020/FullSite
-                  /D10/2020_RMNP_3/L3/Spectrometer/Reflectance/NEON_D10_RMNP_DP3_453000_4458000_reflectance.h5")
+h5_file <- paste0(wd,"DP3.30006.001/neon-aop-products/2020/FullSite/D10/2020_RMNP_3/L3/Spectrometer/Reflectance/NEON_D10_RMNP_DP3_453000_4448000_reflectance.h5")
+
 
 geth5metadata <- function(h5_file){
   # get the site name
@@ -197,27 +186,6 @@ band2Raster <- function(h5_file, band, extent, crs, no_data_value){
 
 h5_meta <- geth5metadata(h5_file)
 
-
-#not working, lets try this instead
-# where to find stuff
-hsi.data.dir <- paste0("Y:/shared_data/NEON_AOP_data/MLBS/2022/NEON_refl-surf-",
-                       "bidir-ortho-mosaic/NEON.D07.MLBS.DP3.30006.002.2022-09.",
-                       "basic.20240530T173638Z.PROVISIONAL/")
-
-# get hsi filenames
-hsi.files <- list.files(hsi.data.dir)
-
-# list all of the data types within the hdf5 (should be the same for all files)
-h5ls(file = paste0(hsi.data.dir, hsi.files[3]))
-
-# get a list of wavelengths (should be the same for all files)
-wavelengths <- h5read(file = paste0(hsi.data.dir, hsi.files[3]),
-                      name = paste0(loc, 
-                                    "/Reflectance/Metadata/Spectral_Data/Wavelength"))
-wave.count <- 1:length(wavelengths)
-wave.round <- round(wavelengths,0)
-wave.names <- paste0("wave.", wave.round)
-
 # get all bands - a consecutive list of integers from 1:426 (# of bands)
 
 all_bands <- as.list(1:length(h5_meta$wavelengths))
@@ -250,8 +218,8 @@ plotRGB(rgb_rast,stretch='lin',axes=TRUE)
 
 #convert the data frame into a shape file (vector)
 
-tree_loc <- vect(cbind(soilmicrobe.2$adjEasting,
-                       soilmicrobe.2$adjNorthing), crs=h5_meta$crs)
+tree_loc <- vect(cbind(fsp_rmnp_picol_20200720_1304$adjEasting,
+                       fsp_rmnp_picol_20200720_1304$adjNorthing), crs=h5_meta$crs)
 
 plot(tree_loc, col="red", add = T)
 
