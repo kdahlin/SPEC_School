@@ -1,7 +1,7 @@
 #Script for analyzing NEON Soil Microbe Data
 rm(list=ls())
 
-install.packages("neonUtilities")
+# install.packages("neonUtilities")
 library(neonUtilities)
 library(geoNEON)
 library(tidyverse)
