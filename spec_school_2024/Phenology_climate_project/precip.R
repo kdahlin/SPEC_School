@@ -49,6 +49,7 @@ SECPREAgg <- SECPRE %>%
   ) %>%
   ungroup %>%
   arrange(verticalPosition,date)
+  
 hpccPath <- 'Z:/phenology/data'
 
 #Save top-of-canopy precipitation
@@ -84,19 +85,50 @@ THRPREAgg %>%
   write.csv(file.path(hpccPath,'under_Precip.csv'))
 
 
+# Plotting function
+plot_SECprec <- function(data, title) {
+  ggplot(data, aes(x = date)) +
+    geom_line(aes(y =  SecPrecip_mean, color = 'Mean')) +
+    geom_line(aes(y = SecPrecip_min, color = 'Min')) +
+    geom_line(aes(y = SecPrecip_max, color = 'Max')) +
+    labs(
+      title = title,
+      x = 'Date',
+      y = 'Overstorey Precipitation (mm)',
+      color = 'Legend'
+    ) +
+    theme_minimal()
+}
 
+# Plotting function
+plot_TFprec <- function(data, title) {
+  ggplot(data, aes(x = date)) +
+    geom_line(aes(y =  TFPrecip_mean, color = 'Mean')) +
+    geom_line(aes(y = TFPrecip_min, color = 'Min')) +
+    geom_line(aes(y = TFPrecip_max, color = 'Max')) +
+    labs(
+      title = title,
+      x = 'Date',
+      y = 'Understorey Precipitation (mm)',
+      color = 'Legend'
+    ) +
+    theme_minimal()
+}
+# Filter data for plotting
+top_PREC <- SECPREAgg %>% filter(verticalPosition == '060')
+bottom_PREC <- THRPREAgg %>% filter(verticalPosition == '000')
 
+# Create plots
+plot_top_PREC <- plot_SECprec(top_PREC, 'Overstorey Precipitation')
+plot_bottom_PREC <- plot_TFprec(bottom_PREC, 'Understorey Precipitation')
 
+# Display plots separately
+plot_top_PREC
+plot_bottom_PREC
 
+# Save the combined plot as a high-quality PNG
+output_path1 <- file.path(hpccPath, 'Overstorey_PP_plot.jpeg')
+ggsave(output_path1, plot = plot_top_PREC, width = 10, height = 8, dpi = 300)
 
-
-
-
-
-
-
-
-
-
-
-
+output_path2 <- file.path(hpccPath, 'Understorey_PP_plot.jpeg')
+ggsave(output_path2, plot = plot_bottom_PREC, width = 10, height = 8, dpi = 300)
