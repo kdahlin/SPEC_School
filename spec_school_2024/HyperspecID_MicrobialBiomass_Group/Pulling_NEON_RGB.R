@@ -7,7 +7,32 @@ product_code <- 'DP3.30010.001'
 site <- "RMNP"
 year <- 2020
 
+soil_microbe <- read.csv('/Users/sestockman/Desktop/Spec School 2024/SPEC_School/spec_school_2024/HyperspecID_MicrobialBiomass_Group/soilmicrobe.csv')
+
+str(soil_microbe)
+
+
 out_file_path <- '/Volumes/rs-016/ersamlab/hyperspec_id_group'
+
+#Now lets download AOP tiles for all the points where there are soil microbes
+options(timeout = max(1000, getOption("timeout")))
+
+byTileAOP(dpID= 'DP3.30006.001',
+          
+          site= 'RMNP',
+          
+          year= 2020,
+          
+          easting= soil_microbe$adjEasting,
+          
+          northing= soil_microbe$adjNorthing,
+          
+          savepath= out_file_path)
+
+
+
+
+
 
 # byTileAOP(): Downloads remote sensing data for the specified data product, subset to tiles that intersect a list of coordinates.
 
