@@ -124,7 +124,9 @@ spectra_traits_sub <- merge(spectra_top_black[spectra_top_black$wavelength == 35
 spectra_traits_sub[c("spectralSampleID","taxonID","stemDistance","stemAzimuth","adjEasting","adjNorthing","crownPolygonID")]
 
 
-wd <- "/Volumes/home-030/f0108963/SPEC_School"
+# wd <- "/Volumes/home-030/f0108963/SPEC_School"
+
+wd <- '/Volumes/rs-016/ersamlab/hyperspec_id_group'
 
 setwd(wd)
 
