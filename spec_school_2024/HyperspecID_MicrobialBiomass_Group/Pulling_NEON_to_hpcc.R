@@ -2,10 +2,14 @@
 library(neonUtilities)
 
 # Define parameters
-product_code <- "DP1.30010.001"
-product_code <- 'DP3.30010.001'
+product_code <- "DP1.30010.001" # RGB
+product_code <- 'DP3.30010.001' # RGB
+product_code <- 'DP3.30006.001' # hyperspec data
+product_code <- 'DP1.10098.001' # vegetation structure survey
+
 site <- "RMNP"
 year <- 2020
+
 
 soil_microbe <- read.csv('/Users/sestockman/Desktop/Spec School 2024/SPEC_School/spec_school_2024/HyperspecID_MicrobialBiomass_Group/soilmicrobe.csv')
 
@@ -14,22 +18,20 @@ str(soil_microbe)
 
 out_file_path <- '/Volumes/rs-016/ersamlab/hyperspec_id_group'
 
-#Now lets download AOP tiles for all the points where there are soil microbes
+# download AOP tiles for all the points
 options(timeout = max(1000, getOption("timeout")))
 
 byTileAOP(dpID= 'DP3.30006.001',
           
-          site= 'RMNP',
+          site= site,
           
-          year= 2020,
+          year= year,
           
           easting= soil_microbe$adjEasting,
           
           northing= soil_microbe$adjNorthing,
           
           savepath= out_file_path)
-
-
 
 
 
@@ -51,12 +53,12 @@ byTileAOP(dpID = product_code,
           savepath = out_file_path,
           check.size = TRUE)
 
-# Download the data
+# Download 
 loadByProduct(dpID = product_code,
                       site = site,
                       startdate = paste0(year, "-01"),
                       enddate = paste0(year, "-12"),
                       package = "basic",
-                      savepath = out_file_path,
+                      # savepath = out_file_path,
                       check.size = TRUE)
 
