@@ -93,7 +93,7 @@ plot_SECprec <- function(data, title) {
     geom_line(aes(y = SecPrecip_max, color = 'Max')) +
     labs(
       title = title,
-      x = 'Date',
+      x = 'Year',
       y = 'Overstorey Precipitation (mm)',
       color = 'Legend'
     ) +
@@ -108,7 +108,7 @@ plot_TFprec <- function(data, title) {
     geom_line(aes(y = TFPrecip_max, color = 'Max')) +
     labs(
       title = title,
-      x = 'Date',
+      x = 'Year',
       y = 'Understorey Precipitation (mm)',
       color = 'Legend'
     ) +
@@ -132,3 +132,4 @@ ggsave(output_path1, plot = plot_top_PREC, width = 10, height = 8, dpi = 300)
 
 output_path2 <- file.path(hpccPath, 'Understorey_PP_plot.jpeg')
 ggsave(output_path2, plot = plot_bottom_PREC, width = 10, height = 8, dpi = 300)
+
