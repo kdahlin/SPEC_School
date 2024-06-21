@@ -53,8 +53,11 @@ byTileAOP(dpID = product_code,
           savepath = out_file_path,
           check.size = TRUE)
 
-# Download 
-loadByProduct(dpID = product_code,
+
+# import and manipulate vegetation structure data -------------------------
+
+
+veg_data <- loadByProduct(dpID = product_code,
                       site = site,
                       startdate = paste0(year, "-01"),
                       enddate = paste0(year, "-12"),
@@ -62,3 +65,8 @@ loadByProduct(dpID = product_code,
                       # savepath = out_file_path,
                       check.size = TRUE)
 
+
+View(veg_data$vst_perplotperyear)
+View(veg_data$vst_perplotperyear)
+View(veg_data$variables_10098)
+veg_data$categoricalCodes_10098
