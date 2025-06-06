@@ -81,17 +81,25 @@ print(in.las)
 names(in.las)
 
 # and look at a point cloud (this will open up a new window)
-plot(in.las)
+plot(in.las,
+     axis = TRUE)
 
 # note the outlier points!
-# let's try to clean this up quickly
+# let's try to clean this up quickly, note that "sor" is a cleaning algorithm
+# see ?classify_noise for more info.
 noise.las <- classify_noise(in.las, sor(15, 10))
 
 # now get rid of those points
 clean.las <- filter_poi(noise.las, Classification != LASNOISE)
 
 # now lets take a look
-plot(clean.las)
+plot(clean.las,
+     axis = TRUE)
+
+## clean up with thresholds if needed - NOTE THIS SHOULD BE ADJUSTED FOR A
+# GIVEN TILE!!!
+# clean.las <- subset(clean.las, clean.las$Z > 1000)
+# clean.las <- subset(clean.las, clean.las$Z < 1300)
 
 # lets make a DTM
 dtm <- rasterize_terrain(clean.las,
