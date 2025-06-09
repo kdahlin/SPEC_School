@@ -1,6 +1,6 @@
 #### exploring NEON lidar data! ####
 # written by Kyla Dahlin (MSU)
-# updated 20250606
+# updated 20250609
 
 # Note that commented out parts of this script are for downloading NEON lidar
 # data from NEON if you haven't already (but then make sure to organize files 
