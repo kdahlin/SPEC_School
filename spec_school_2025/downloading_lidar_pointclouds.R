@@ -1,18 +1,23 @@
 # Script for downloading NEON tiles
-# min / max easting and northing found by sorting on the NEON data portal
 
+
+# need the neonUtilities library
 library(neonUtilities)
 
+# saving these to my local machine then will move to HPCC with filezilla or psftp
 setwd("C:/geo_temp/MLBS_2022/")
 
+# min / max easting and northing found by sorting on the NEON data portal
 min.easting <- 535000
 max.easting <- 547000
 min.northing <- 4131000
 max.northing <- 4143000
 
+# make a list of the easting values by 1000s (units are meters, so 1 km = 1000 m)
 easting.list <- seq(from = min.easting,
                     to = max.easting, 
                     by = 1000)
+
 
 northing.list <- seq(from = min.northing,
                      to = max.northing,
