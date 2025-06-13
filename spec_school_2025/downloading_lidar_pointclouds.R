@@ -1,10 +1,10 @@
 # Script for downloading NEON tiles
 
-
 # need the neonUtilities library
 library(neonUtilities)
 
-# saving these to my local machine then will move to HPCC with filezilla or psftp
+# saving these to my local machine then will move to HPCC with globus 
+# see https://docs.icer.msu.edu/Transferring_data_with_Globus/
 setwd("C:/geo_temp/MLBS_2022/")
 
 # min / max easting and northing found by sorting on the NEON data portal
