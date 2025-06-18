@@ -95,3 +95,29 @@ getwd()
 setwd("C:/Desktop/Spec2025/SPEC_School/spec_school_2025/leaf_level_spectra")
 wa<-read.csv("weight.area.csv")
 
+#mess around with weight & area
+ggplot(data=wa, aes(x=Weight.A_g, y=Area_cm2))+geom_point()
+ggplot(data=wa, aes(x=Weight.B_g, y=Area_cm2))+geom_point()
+ggplot(data=wa, aes(x=Weight.C_g, y=Area_cm2))+geom_point()
+ggplot(data=wa, aes(x=Weight.D_g, y=Area_cm2))+geom_point()
+
+#calculate some indices??
+
+
+#leaf water content (LWC) from Yu et al. 2001 eq 9.1
+#497.2 exp(−7.1936 R1483)
+
+specs2$LWC <- ifelse(specs2$wavelength == 1483.8,
+                        497.2 * exp(-7.1936 * specs2$value),
+                        NA)  
+
+# For subsetting rows with non-missing LWC:
+LWC <- specs2[!is.na(specs2$LWC), ]
+
+LWC<-LWC[-1,]
+
+ggplot(data=LWC, aes(x=timestep, y=LWC))+geom_bar(stat="identity")
+
+
+#
+
