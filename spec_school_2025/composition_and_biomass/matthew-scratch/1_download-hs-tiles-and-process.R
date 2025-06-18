@@ -2,35 +2,23 @@
 # Introduction to Hyperspectral Remote Sensing Data in R tutorial
 # from NEON
 
-## ----install-load-library, results="hide"------------------------------------------------------------------------------------------------------------------------------------
+### identify plots to download specific AOP tiles
+# Load NEON plots
 
-library(dplyr)
-library(terra)
-library(rhdf5)
-library(neonUtilities)
-library(tidyverse)
-library(ggplot2)
-library(sf)
-
-## ----set-wd, results="hide"--------------------------------------------------------------------------------------------------------------------------------------------------
-
-wd <- "C:\\Users\\mille\\Documents\\NAU 2024-2026\\spec-school-summer-2025\\" #This will depend on your local environment
-setwd(wd)
-
-# uncomment if need to download hyperspectral data
+# #- uncomment if need to download hyperspectral data
 # #----download-refl, eval=FALSE-----------------------------------------------------------------------------------------------------------------------------------------------
-# byTileAOP(dpID='DP3.30006.001',
+# byTileAOP(dpID='DP3.30006.002',
 #           site='MLBS',
-#           year='2018',
+#           year='2023',
 #           easting=542000,
-#           northing=4137000,
-#           check.size=TRUE, # set to FALSE if you don't want to enter y/n
+#           northing=4136000,
+#           check.size=TRUE,
 #           savepath = wd)
 
 
 ## ----define-h5, results="hide"-----------------------------------------------------------------------------------------------------------------------------------------------
 # Define the h5 file name to be opened
-h5_file <- paste0(wd,"DP3.30006.001/neon-aop-products/2018/FullSite/D07/2018_MLBS_3/L3/Spectrometer/Reflectance/NEON_D07_MLBS_DP3_542000_4137000_reflectance.h5")
+h5_file <- paste0(wd,"DP3.30006.002/neon-aop-provisional-products/2023/FullSite/D07/2023_MLBS_6/L3/Spectrometer/Reflectance/NEON_D07_MLBS_DP3_542000_4136000_bidirectional_reflectance.h5")
 
 
 ## ----view-file-strux, eval=FALSE, comment=NA---------------------------------------------------------------------------------------------------------------------------------
@@ -141,6 +129,7 @@ hsStack <- rast(full_hs_stack)
 hsStack <- hsStack / as.integer(reflInfo$Scale_Factor)
 
 hsStack
+# test plots
 plot(hsStack[[c(1, 50, 100)]], main = c("Band 1", "Band 50", "Band 100"))
 
 # Find band indices closest to typical RGB wavelengths

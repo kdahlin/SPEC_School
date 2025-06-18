@@ -1,18 +1,22 @@
-##################
+## ----set-wd, results="hide"--------------------------------------------------------------------------------------------------------------------------------------------------
+wd <- "C:\\Users\\mille\\Documents\\NAU 2024-2026\\spec-school-summer-2025\\" #This will depend on your local environment
+setwd(wd)
+
+library(dplyr)
+library(terra)
+library(tidyverse)
+library(ggplot2)
+library(sf)
+
 # Load NEON plots
-##################
 plots <- st_read("lidar/All_NEON_TOS_Plots_V11/All_NEON_TOS_Plots_V11/All_NEON_TOS_Plot_Centroids_V11.shp")
 
 # plots of interest
 # MLBS_061 to 075 and 002 and 009
-
+library(rhdf5)
 library(neonUtilities)
 
-# Set your working directory again if needed
-wd <- "C:\\Users\\mille\\Documents\\NAU 2024-2026\\spec-school-summer-2025\\"
-setwd(wd)
-
-# Download foliar chemistry data (DP1.10026.001)
+# Download foliar chemistry data
 fc <- loadByProduct(dpID = "DP1.10026.001",
                     site = "MLBS",
                     startdate = "2023-01",
@@ -41,28 +45,3 @@ fc_filtered_unique <- fc_filtered %>%
 plots_unique <- plots %>%
   filter(plotID %in% fc_filtered_unique$plotID) %>%
   distinct(plotID, .keep_all = TRUE)
-
-# Now join just once per plot
-fc_joined <- fc_filtered_unique %>%
-  left_join(plots_unique, by = "plotID") %>%
-  st_as_sf() %>%
-  st_transform(crs = h5CRS)
-
-fc_vect <- vect(fc_joined)
-
-plot_spectra <- terra::extract(hsStack, fc_vect, fun = mean, na.rm = TRUE)
-
-spectra_with_traits <- cbind(fc_filtered_unique, plot_spectra[,-1])
-
-spectra_with_traits <- spectra_with_traits %>%
-  select(where(~ !all(is.na(.))))
-
-glimpse(spectra_with_traits)
-
-plot(hsStack[[1]], main = "Plot locations over Band 1 of Hyperspectral Image")
-plot(fc_vect, add = TRUE, col = "red", pch = 16)
-
-as.data.frame(geom(fc_vect))
-
-### TO DO TOMORROW - RE DO AOP DOWNLOAD,
-### FIGURE OUT HOW TO GET THE TILES THAT CORRESPOND TO THE PLOTS
