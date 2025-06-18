@@ -91,6 +91,7 @@ ggplot(data=SMs, aes(x=wavelength, y=value, color=individual))+geom_line(linewid
 #try to get at leaf timeseries
 ggplot(data=WOs, aes(x=wavelength, y=value, color=trt))+geom_line()
 
-
-unique(specs2$species)
+getwd()
+setwd("C:/Desktop/Spec2025/SPEC_School/spec_school_2025/leaf_level_spectra")
+wa<-read.csv("weight.area.csv")
 
