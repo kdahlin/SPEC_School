@@ -120,8 +120,3 @@ setwd("C:/Desktop/Spec2025/SPEC_School/spec_school_2025/MLBS_2025_spectra")
 write.csv(spectra2.csv, 
           file = "MLBS2025_SPEC_School_spectra_final.csv")
 
-        
-
-
-
-

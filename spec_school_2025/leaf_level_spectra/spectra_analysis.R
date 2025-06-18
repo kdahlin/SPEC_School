@@ -6,19 +6,91 @@ specs<-read.csv("MLBS2025_SPEC_School_spectra_final.csv")
 library(ggplot2)
 library(tidyverse)
 
-specs2<-pivot_longer(specs, cols=3:97 ,names_to="trt", values_to="value")
+specs2 <- specs %>%
+  pivot_longer(
+    cols = -wavelength,
+    names_to = "label",
+    values_to = "value"
+  )
+head(specs2)
 
-ggplot(data=specs2, aes(x=wavelength, y=value, color=trt))+geom_line()
 
-timestep<-substr(specs2$trt, start=1, stop=1)
-species<-substr(specs2$trt, start=2, stop=3)
-individual<-substr(specs2$trt, start=4, stop=4)
-temp<-substr(specs2$trt, start=6, stop=6)
-specs2<-mutate(specs2, timestep=timestep, species=species, individual=individual, temp=temp)
+specs2 <- specs2 %>% 
+  mutate(timestep = substr(label,1,1),
+         species = substr(label,2,3),
+         individual = substr(label,4,4),
+         temp = substr(label,6,6))
 
-?substr
-?mutate
+specs2<-specs2[-1,]
+
 
 getwd()
 write.csv(specs2, "facet_spectra.csv")
+
+tcolor<-c("#154360", "#FF5733", "#FFC300", "#1ABC9C")
+trtcolor<-c("red","blue")
+
+#by species and timestep
+BOs <-subset(specs2, species == "BO")
+ggplot(data=BOs, aes(x=wavelength, y=value, color=timestep))+geom_line(linewidth=0.5)+
+  scale_color_manual(values = tcolor)+
+  facet_wrap(~ timestep, scales = "free_y")
+
+WOs<-subset(specs2, species == "WO")
+ggplot(data=WOs, aes(x=wavelength, y=value, color=timestep))+geom_line(linewidth=0.5)+
+  scale_color_manual(values = tcolor)+
+  facet_wrap(~ timestep, scales = "free_y")
+
+RMs<-subset(specs2, species == "RM")
+ggplot(data=RMs, aes(x=wavelength, y=value, color=timestep))+geom_line(linewidth=0.5)+
+  scale_color_manual(values = tcolor)+
+  facet_wrap(~ timestep, scales = "free_y")
+
+SMs<-subset(specs2, species == "SM")
+ggplot(data=SMs,aes(x=wavelength, y=value, color=timestep))+geom_line(linewidth=0.5)+
+  scale_color_manual(values = tcolor)+
+  facet_wrap(~ timestep, scales = "free_y")
+
+
+trtcolor<-c("blue", "red")
+#by species and treatment
+BOs <-subset(specs2, species == "BO")
+ggplot(data=BOs, aes(x=wavelength, y=value, color=temp))+geom_line(linewidth=0.5)+
+  scale_color_manual(values = trtcolor)+facet_wrap(~ temp, scales = "free_y")
+
+WOs<-subset(specs2, species == "WO")
+ggplot(data=WOs, aes(x=wavelength, y=value, color=temp))+geom_line(linewidth=0.5)+
+  scale_color_manual(values = trtcolor)+facet_wrap(~ temp, scales = "free_y")
+
+RMs<-subset(specs2, species == "RM")
+ggplot(data=RMs, aes(x=wavelength, y=value, color=temp))+geom_line(linewidth=0.5)+
+  scale_color_manual(values = trtcolor)+facet_wrap(~ temp, scales = "free_y")
+
+SMs<-subset(specs2, species == "SM")
+ggplot(data=SMs,aes(x=wavelength, y=value, color=temp))+geom_line(linewidth=0.5)+
+  scale_color_manual(values = trtcolor)+facet_wrap(~ temp, scales = "free_y")       
+
+
+indcolor<-c("green", "yellow", "orange")
+BOs <-subset(specs2, species == "BO")
+ggplot(data=BOs, aes(x=wavelength, y=value, color=individual))+geom_line(linewidth=0.5)+
+  scale_color_manual(values = indcolor)+facet_wrap(~ individual, scales = "free_y")
+
+WOs<-subset(specs2, species == "WO")
+ggplot(data=WOs,  aes(x=wavelength, y=value, color=individual))+geom_line(linewidth=0.5)+
+  scale_color_manual(values = indcolor)+facet_wrap(~ individual, scales = "free_y")
+
+RMs<-subset(specs2, species == "RM")
+ggplot(data=RMs,  aes(x=wavelength, y=value, color=individual))+geom_line(linewidth=0.5)+
+  scale_color_manual(values = indcolor)+facet_wrap(~ individual, scales = "free_y")
+
+SMs<-subset(specs2, species == "SM")
+ggplot(data=SMs, aes(x=wavelength, y=value, color=individual))+geom_line(linewidth=0.5)+
+  scale_color_manual(values = indcolor)+facet_wrap(~ individual, scales = "free_y")
+
+#try to get at leaf timeseries
+ggplot(data=WOs, aes(x=wavelength, y=value, color=trt))+geom_line()
+
+
+unique(specs2$species)
 
