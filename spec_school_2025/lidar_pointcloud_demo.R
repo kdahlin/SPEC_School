@@ -112,6 +112,7 @@ plot_dtm3d(dtm)
 
 # normalize the point cloud so ground is flat
 flat.ground <- clean.las - dtm
+# could also use "normalize_height"
 
 # and take a look
 plot(flat.ground)

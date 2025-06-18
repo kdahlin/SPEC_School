@@ -1,0 +1,91 @@
+// This script shows how to read in the AOP Image Collections, find available data,
+// and displays true color images of CLBJ directional reflectance, collected in 2021
+// and bidiretional reflectance, collected in 2022 
+ 
+var refl001 = ee.ImageCollection('projects/neon-prod-earthengine/assets/HSI_REFL/001')
+
+var refl002 = ee.ImageCollection('projects/neon-prod-earthengine/assets/HSI_REFL/002')
+
+var rgb = ee.ImageCollection('projects/neon-prod-earthengine/assets/RGB/001')
+
+var chm = ee.ImageCollection('projects/neon-prod-earthengine/assets/CHM/001')
+
+var dem = ee.ImageCollection('projects/neon-prod-earthengine/assets/DEM/001')
+
+// list all available images in the NEON Surface Directional Reflectance Image Collection:
+print('NEON Images in the Directional Reflectance Collection',
+      refl001.aggregate_array('system:index'))
+      
+// list all available images in the NEON Surface Bidirectional Reflectance Image Collection:
+print('NEON Images in the Bidirectional Reflectance Collection',
+      refl002.aggregate_array('system:index'))
+
+// list all available images in the NEON DEM image collection:
+print('NEON Images in the DEM Collection',
+      dem.aggregate_array('system:index'))
+
+// list all available images in the NEON CHM image collection:
+print('NEON Images in the CHM Collection',
+      chm.aggregate_array('system:index'))
+
+// list all available images in the NEON CHM image collection:
+print('NEON Images in the RGB Camera Collection',
+      rgb.aggregate_array('system:index'))
+
+// read in a single reflectance (001) image at the NEON site CLBJ in 2021
+var refl001_MLBS_2018 = refl001
+  .filterDate('2018-01-01', '2018-12-31') // filter by date - 2021
+  .filterMetadata('NEON_SITE', 'equals', 'MLBS') // filter by site
+  .first(); // select the first one to pull out a single image
+
+// look at the image properties
+var mlbs2018_refl_properties = refl001_MLBS_2018.toDictionary()
+print('MLBS 2018 Directional Reflectance Properties:', mlbs2018_refl_properties)
+
+// determine the release information for this image
+// see https://www.neonscience.org/data-samples/data-management/data-revisions-releases
+var mlbs2018_release_status = mlbs2018_refl_properties.select(['PROVISIONAL_RELEASED']);
+print('MLBS 2018 Directional Reflectance Release Status:', mlbs2018_release_status)
+var mlbs2018_release_year = mlbs2018_refl_properties.select(['RELEASE_YEAR']);
+print('MLBS 2018 Directional Reflectance Release Year:', mlbs2018_release_year)
+
+// pull out the red, green, and blue bands
+var refl001_MLBS_2018_RGB = refl001_MLBS_2018.select(['B053', 'B035', 'B019']);
+
+// set visualization parameters
+var refl_rgb_vis = {min: 0, max: 1260, gamma: 0.8};
+
+// use centerObject to center on the reflectance data, 13 is the zoom level
+Map.centerObject(refl001_MLBS_2018, 13)
+
+// alternatively you could specify the lat / lon of the site, set zoom to 13
+// you can find the field site lat/lon here https://www.neonscience.org/field-sites/clbj
+// Map.setCenter(-97.57, 33.40, 13);
+
+// add this RGB layer to the Map and give it a title
+Map.addLayer(refl001_MLBS_2018_RGB, refl_rgb_vis, 'MLBS 2018 Directional Reflectance RGB');
+
+// read in a single reflectance (002) image at the NEON site CLBJ in 2022
+var refl002_MLBS_2022 = refl002
+  .filterDate('2022-01-01', '2022-12-31') // filter by date - 2022
+  .filterMetadata('NEON_SITE', 'equals', 'MLBS') // filter by site
+  .first(); // select the first one to pull out a single image
+
+// read the properties into a variable
+var mlbs2022_refl_properties = refl002_MLBS_2022.toDictionary()
+
+// determine the release information for this BRDF-corrected image
+var mlbs2022_release_status = mlbs2022_refl_properties.select(['PROVISIONAL_RELEASED']);
+print('MLBS 2022 Bidirectional Reflectance Release Status:', mlbs2022_release_status)
+
+// if you try to read in the release year, it will throw an error
+// since this data product is still PROVISIONAL, there is no release year
+// comment out these lines below to remove
+var mlbs2022_release_year = mlbs2022_refl_properties.select(['RELEASE_YEAR']);
+print('MLBS 2022 Bidirectional Reflectance Release Year:', mlbs2022_release_year)
+  
+// pull out the red, green, and blue bands
+var refl002_MLBS_2022_RGB = refl002_MLBS_2022.select(['B053', 'B035', 'B019']);
+
+// add this RGB layer to the Map and give it a title
+Map.addLayer(refl002_MLBS_2022_RGB, refl_rgb_vis, 'MLBS 2022 Bidirectional Reflectance RGB');
