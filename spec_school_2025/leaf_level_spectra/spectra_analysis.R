@@ -95,6 +95,9 @@ getwd()
 setwd("C:/Desktop/Spec2025/SPEC_School/spec_school_2025/leaf_level_spectra")
 wa<-read.csv("weight.area.csv")
 
+wa2<-pivot_longer(wa, )
+?pivot_longer
+
 #mess around with weight & area
 ggplot(data=wa, aes(x=Weight.A_g, y=Area_cm2))+geom_point()
 ggplot(data=wa, aes(x=Weight.B_g, y=Area_cm2))+geom_point()
@@ -118,6 +121,9 @@ LWC<-LWC[-1,]
 
 ggplot(data=LWC, aes(x=timestep, y=LWC))+geom_bar(stat="identity")
 
+wa$wcontent<-wa$Weight.A_g-wa$final_weight_G
 
+#average across plants//species level trends
+#calc more indices
 #
 
