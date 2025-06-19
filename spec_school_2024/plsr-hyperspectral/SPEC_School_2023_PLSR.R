@@ -63,7 +63,7 @@ View(field_data) #appears to be an issue with this data table, we'll fix this
 #in the data wrangling chunk
 View(lab_data) #looks fine, but there are some odd variable names carried 
 #over from the original .xlsx
-view(spec_data) # these data were preprocessed so they look good except for a
+View(spec_data) # these data were preprocessed so they look good except for a
 # capitalization issue
 
 #remove extra columns and rows that only contain NAs, 
