@@ -218,7 +218,7 @@ matplot(wavelengths,
         type = "l", 
         xlab = "Wavelength (nm)",
         ylab = "HSI Reflectance",
-        main = "2018 All Sites HSI spectra - training data")
+        main = "2023 MLBS Leaf HSI spectra - training data")
 
 #lets take a look at the correlation between the spectra and biochemical data
 plot(wavelengths,
