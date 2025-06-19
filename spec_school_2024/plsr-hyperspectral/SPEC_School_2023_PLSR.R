@@ -36,10 +36,10 @@ library(GGally)
 today <- format(Sys.time(), "%Y%m%d")
 
 # directory where you want to store/write stuff
-home.dir <- "K:/SPEC_School_2024/"
+home.dir <- "X:/SPEC_School_2025/"
 
 # HPCC directory where data is stored
-hpcc.dir <- "Z:/shared_data/foliar_chemistry/2023_SPEC_School/"
+hpcc.dir <- "X:/shared_data/foliar_chemistry/2023_SPEC_School/"
 
 # set this as our working directory so we can easily pull in data
 setwd(hpcc.dir)
