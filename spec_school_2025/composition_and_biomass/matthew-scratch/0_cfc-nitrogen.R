@@ -22,7 +22,7 @@ fc <- loadByProduct(dpID = "DP1.10026.001",
                     startdate = "2023-01",
                     enddate = "2023-12",
                     package = "expanded",
-                    check.size = TRUE)
+                    check.size = FALSE)
 
 fc_cfc_nitrogen <- fc$cfc_carbonNitrogen
 

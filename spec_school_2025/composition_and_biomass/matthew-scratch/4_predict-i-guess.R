@@ -33,5 +33,6 @@ values(nitrogen_raster)[non_na_rows] <- predicted_nitrogen
 # 6. Plot or save
 plot(nitrogen_raster, main = "Predicted % Nitrogen Content")
 
+# cap to 5 because unrealistic output
 nitrogen_raster_capped <- clamp(nitrogen_raster, lower = 0, upper = 5)
 plot(nitrogen_raster_capped, main = "Capped Nitrogen Content (% dry mass)")
