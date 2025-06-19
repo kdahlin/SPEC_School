@@ -17,6 +17,7 @@ hist(averaged_spectra$avg_value)
 
 library(MASS)
 library(ggplot2)
+library(ggpmisc)
 rsq <- function (x, y) cor(x, y) ^ 2
 
 #first model
@@ -44,7 +45,20 @@ vec2<-two$fitted.values
 
 averaged_spectra$vec2<-vec2
 
-ggplot(data=averaged_spectra, aes(x=avg_value, y=vec2))+geom_point()
+ggplot(data = averaged_spectra, aes(x = avg_value, y = vec2)) +
+  geom_point() +
+  stat_smooth(method = "lm", se = TRUE, color="violet") +
+  stat_poly_eq(
+    aes(label = paste(..rr.label..)),
+    formula = y ~ x,
+    parse = TRUE,
+    size = 5
+  ) +
+  labs(x = "Measured", y = "Predicted", title="Reflectance Model") +
+  theme_bw()
+
 
 rsq(averaged_spectra$avg_value, averaged_spectra$vec2)
+
+
 
