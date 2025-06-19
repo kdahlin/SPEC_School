@@ -178,7 +178,7 @@ test.data <- sample_n(data.plsr, test.n,
 training.data <- data.plsr[!(data.plsr$sample_ID %in% test.data$sample_ID),]
 
 # lets subset out the spectra data so we can just use that
-# this is getting ready to format the data to work with the PLRS function
+# this is getting ready to format the data to work with the PLSR function
 spectra.training.data <- training.data[,3:ncol(training.data)]
 n.training.data <- training.data[,1:2]
 
@@ -304,8 +304,8 @@ boxplot(pressDFres$value ~ pressDFres$variable,
 # We can do this with a simple T-Test - a smaller PRESS statistic is better. so 
 # lets see where this starts to vary. we want the lowest number of components so
 # that we don't over predict our model.
-loc.1 <- 2
-loc.2 <- 3
+loc.1 <- 1
+loc.2 <- 2
 ttest <- t.test(pressDFres$value[which(pressDFres$variable == loc.1)], 
                 pressDFres$value[which(pressDFres$variable == loc.2)])
 
@@ -320,7 +320,7 @@ ttest
 nComps <- 3
 
 plsr.out <- plsr(as.formula(paste(in.var, "~", "spectra")), scale = FALSE,
-                 ncomp = n.comps, validation = "LOO",
+                 ncomp = nComps, validation = "LOO",
                  trace = TRUE, data = plsr.dataset)
 
 #lets save our fitted values
