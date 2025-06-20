@@ -36,10 +36,10 @@ library(GGally)
 today <- format(Sys.time(), "%Y%m%d")
 
 # directory where you want to store/write stuff
-home.dir <- "K:/SPEC_School_2024/"
+home.dir <- "X:/SPEC_School_2025/"
 
 # HPCC directory where data is stored
-hpcc.dir <- "Z:/shared_data/foliar_chemistry/2023_SPEC_School/"
+hpcc.dir <- "X:/shared_data/foliar_chemistry/2023_SPEC_School/"
 
 # set this as our working directory so we can easily pull in data
 setwd(hpcc.dir)
@@ -63,7 +63,7 @@ View(field_data) #appears to be an issue with this data table, we'll fix this
 #in the data wrangling chunk
 View(lab_data) #looks fine, but there are some odd variable names carried 
 #over from the original .xlsx
-view(spec_data) # these data were preprocessed so they look good except for a
+View(spec_data) # these data were preprocessed so they look good except for a
 # capitalization issue
 
 #remove extra columns and rows that only contain NAs, 
@@ -218,7 +218,7 @@ matplot(wavelengths,
         type = "l", 
         xlab = "Wavelength (nm)",
         ylab = "HSI Reflectance",
-        main = "2018 All Sites HSI spectra - training data")
+        main = "2023 MLBS Leaf HSI spectra - training data")
 
 #lets take a look at the correlation between the spectra and biochemical data
 plot(wavelengths,

@@ -18,7 +18,13 @@
 
 ## ----define-h5, results="hide"-----------------------------------------------------------------------------------------------------------------------------------------------
 # Define the h5 file name to be opened
+#542
+# plots 002 009 062 064 065 071 073 075 
 h5_file <- paste0(wd,"DP3.30006.002/neon-aop-provisional-products/2023/FullSite/D07/2023_MLBS_6/L3/Spectrometer/Reflectance/NEON_D07_MLBS_DP3_542000_4136000_bidirectional_reflectance.h5")
+
+#541
+# plots
+h5_file <- paste0(wd,"DP3.30006.002/neon-aop-provisional-products/2023/FullSite/D07/2023_MLBS_6/L3/Spectrometer/Reflectance/NEON_D07_MLBS_DP3_541000_4136000_bidirectional_reflectance.h5")
 
 
 ## ----view-file-strux, eval=FALSE, comment=NA---------------------------------------------------------------------------------------------------------------------------------
@@ -129,8 +135,8 @@ hsStack <- rast(full_hs_stack)
 hsStack <- hsStack / as.integer(reflInfo$Scale_Factor)
 
 hsStack
-# test plots
-plot(hsStack[[c(1, 50, 100)]], main = c("Band 1", "Band 50", "Band 100"))
+# # test plots
+# plot(hsStack[[c(1, 50, 100)]], main = c("Band 1", "Band 50", "Band 100"))
 
 # Find band indices closest to typical RGB wavelengths
 red_band   <- which.min(abs(wavelengths - 650))  # ~650 nm
