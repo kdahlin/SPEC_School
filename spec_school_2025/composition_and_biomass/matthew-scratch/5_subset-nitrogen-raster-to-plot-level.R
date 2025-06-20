@@ -1,7 +1,7 @@
 # draw 40 x 40 plot with buffer from centroid
 # Filter for just MLBS_002
-plot_002 <- plots_unique %>% 
-  filter(plotID == "MLBS_002") %>% 
+plot_002 <- plots %>% 
+  filter(plotID == "MLBS_061") %>% 
   st_transform(crs = crs(nitrogen_agg40))  # match CRS if needed
 
 # Convert to SpatVector
