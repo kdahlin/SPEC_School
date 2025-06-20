@@ -3,11 +3,11 @@
 plots <- st_read("lidar/All_NEON_TOS_Plots_V11/All_NEON_TOS_Plots_V11/All_NEON_TOS_Plot_Centroids_V11.shp")
 
 # Reproject to UTM Zone 17N
-plots_utm <- st_transform(plots_unique, crs = 26917)
+plots_utm <- st_transform(plots, crs = 26917)
 
 # Filter and extract center coords
 plot_coords <- plots_utm %>%
-  filter(plotID %in% paste0("MLBS_", sprintf("%03d", c(2, 9, 61:75)))) %>%
+  filter(plotID %in% paste0("MLBS_", sprintf("%03d", c(6,20)))) %>%
   mutate(
     tile_easting = floor(st_coordinates(.)[,1] / 1000) * 1000,
     tile_northing = floor(st_coordinates(.)[,2] / 1000) * 1000

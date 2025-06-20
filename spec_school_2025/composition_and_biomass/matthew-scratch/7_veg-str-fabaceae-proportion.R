@@ -5,10 +5,10 @@ library(dplyr)
 library(ggplot2)
 library(tidyr)
 
-## Load vegetation structure data
-# veg_data <- loadByProduct(dpID = "DP1.10098.001", site = "MLBS", 
-#                           startdate = "2023-01", enddate = "2023-12", 
-#                           package = "basic", check.size = FALSE)
+# Load vegetation structure data
+veg_data <- loadByProduct(dpID = "DP1.10098.001", site = "MLBS",
+                          startdate = "2023-01", enddate = "2023-12",
+                          package = "basic", check.size = FALSE)
 
 # Extract tables
 vst_ai  <- veg_data$vst_apparentindividual        # Tree measurements per stem

@@ -24,7 +24,7 @@ h5_file <- paste0(wd,"DP3.30006.002/neon-aop-provisional-products/2023/FullSite/
 
 #541
 # plots
-h5_file <- paste0(wd,"DP3.30006.002/neon-aop-provisional-products/2023/FullSite/D07/2023_MLBS_6/L3/Spectrometer/Reflectance/NEON_D07_MLBS_DP3_541000_4136000_bidirectional_reflectance.h5")
+#h5_file <- paste0(wd,"DP3.30006.002/neon-aop-provisional-products/2023/FullSite/D07/2023_MLBS_6/L3/Spectrometer/Reflectance/NEON_D07_MLBS_DP3_541000_4136000_bidirectional_reflectance.h5")
 
 
 ## ----view-file-strux, eval=FALSE, comment=NA---------------------------------------------------------------------------------------------------------------------------------

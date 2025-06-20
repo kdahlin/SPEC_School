@@ -35,4 +35,19 @@ plot(nitrogen_raster, main = "Predicted % Nitrogen Content")
 
 # cap to 5 because unrealistic output
 nitrogen_raster_capped <- clamp(nitrogen_raster, lower = 0, upper = 5)
-plot(nitrogen_raster_capped, main = "Capped Nitrogen Content (% dry mass)")
+plot(nitrogen_raster_capped, main = "Nitrogen Content (% dry mass)")
+plot(fc_vect, add = TRUE, col = "red", pch = 16)
+text(fc_vect, labels = fc_vect$plotID, pos = 3, cex = 0.8, col = "black")
+
+# Resample to 40-meter resolution using aggregation
+# 40x40 meter pixels assuming input is 1x1m resolution
+agg_factor <- 40  # Adjust this if native pixel size is not exactly 1m
+
+# Use mean aggregation across 40x40 pixel blocks
+nitrogen_agg40 <- aggregate(nitrogen_raster_capped, fact = agg_factor, fun = mean, na.rm = TRUE)
+
+# Optional: visualize
+plot(nitrogen_agg40, main = "Predicted %N dry mass")
+plot(fc_vect, add = TRUE, col = "red", pch = 16)
+text(fc_vect, labels = fc_vect$plotID, pos = 3, cex = 0.8, col = "white")
+

@@ -9,10 +9,10 @@ library(terra)
 plot_vect <- vect(fabaceae_summary, geom = c("easting", "northing"), crs = "EPSG:32617")  # Adjust UTM zone if needed
 
 # Extract canopy %N at plot locations
-plot_N_values <- extract(nitrogen_raster, plot_vect)
+plot_N_values <- terra::extract(nitrogen_raster, plot_vect)
 fabaceae_summary$canopy_percent_N <- plot_N_values[, 2]  # column 1 is ID
 
-# Plot relationship
+# Plot relationship - lol
 ggplot(fabaceae_summary, aes(x = fabaceae_rel_abundance, y = canopy_percent_N)) +
   geom_point() +
   geom_smooth(method = "lm") +

@@ -23,8 +23,8 @@ plsr_data_filtered <- plsr_data[ , -c(1, nzv + 1)]  # +1 to offset exclusion of 
 plsr_data_filtered$nitrogenPercent <- plsr_data$nitrogenPercent  # Add response back
 
 plsr_model <- plsr(nitrogenPercent ~ ., 
-                   data = plsr_data_filtered, # if dropping near zero variance change to plsr_data_filtered
-                   ncomp = 1,
+                   data = plsr_data_filtered,
+                   ncomp = 3,
                    validation = "none", 
                    scale = TRUE)
 

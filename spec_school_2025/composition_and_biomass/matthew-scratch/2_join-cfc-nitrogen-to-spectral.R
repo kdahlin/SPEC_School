@@ -16,8 +16,8 @@ spectra_with_traits <- spectra_with_traits %>%
 glimpse(spectra_with_traits)
 
 # check plots w/ nitrogen data over hs tile
-plot(hsStack[[1]], main = "Plot locations over Band 1 of Hyperspectral Image")
+plot(hsStack[[1]], main = "Plots in tile (Band 1)")
 plot(fc_vect, add = TRUE, col = "red", pch = 16)
-text(fc_vect, labels = fc_vect$plotID, pos = 3, cex = 0.8, col = "black")
+text(fc_vect, labels = fc_vect$plotID, pos = 3, cex = 0.8, col = "white")
 
 as.data.frame(geom(fc_vect))
