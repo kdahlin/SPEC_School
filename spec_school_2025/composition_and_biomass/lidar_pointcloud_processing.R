@@ -370,6 +370,9 @@ mlbs_biomass <- height_frame %>%
   ) %>%
   group_by(plot) %>%
   summarize(
+    height_sd = sd(height), 
+    height = mean(height), 
+    sd = sd(biomass),
     biomass = sum(biomass)
   )
 write.csv(mlbs_biomass, file = "biomass.csv")
