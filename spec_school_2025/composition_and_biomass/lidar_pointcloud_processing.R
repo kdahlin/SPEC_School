@@ -372,6 +372,7 @@ mlbs_biomass <- height_frame %>%
   summarize(
     biomass = sum(biomass)
   )
+write.csv(mlbs_biomass, file = "biomass.csv")
 mlbs_biomass
 
 # There we go! We have the biomass for all of the plots. 
