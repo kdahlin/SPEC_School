@@ -8,23 +8,20 @@
 #install.packages(c("rgdal", "raster", "ggplot2", "terra"))
 
 # load the packages you need for this module
-library(rgdal)
 library(ggplot2)
 library(viridisLite)
 library(terra)
 
-# set the workding directory (where R will look for your files)
-setwd("C:/Users/kdahlin/Dropbox/EDDIE_module/NEON_data_organized/")
 
 # load the data! these paths will need to be changed for other data sets
 # DTM = Digital Terrain Model (= DEM)
-dtm <- rast("./ca_soap_2018/NEON_D17_SOAP_DP3_298000_4100000_DTM.tif")
+dtm <- rast("./spec_school_2026/EDDIE_Lab/NEON_data_organized/CA_SOAP_2019/NEON_D17_SOAP_DP3_298000_4100000_DTM.tif")
 
 # DSM = Digital Surface Model (= LiDAR first returns, topo + vegetation)
-dsm <- rast("./ca_soap_2018/NEON_D17_SOAP_DP3_298000_4100000_DSM.tif")
+dsm <- rast("./spec_school_2026/EDDIE_Lab/NEON_data_organized/CA_SOAP_2019/NEON_D17_SOAP_DP3_298000_4100000_DSM.tif")
 
 # NDVI = Normalized Difference Vegetation Index
-ndvi <- rast("./ca_soap_2018/NEON_D17_SOAP_DP3_298000_4100000_NDVI.tif")
+ndvi <- rast("./spec_school_2026/EDDIE_Lab/NEON_data_organized/CA_SOAP_2019/NEON_D17_SOAP_DP3_298000_4100000_NDVI.tif")
 
 # calculate vegetation height as the DSM minus the DTM
 veg.ht <- dsm - dtm
