@@ -18,12 +18,8 @@ library(rnaturalearth)
 library(rnaturalearthhires)
 library(rnaturalearthdata)
 
-# set your working directory to where your table of neon site info is
-# stored
-setwd("***/NEON_data_organized/")
-
 # read in the NEON point data (with your R2 values added in the R2 column)
-neon.points <- read.csv("./EDDIE_lab/EDDIE_lab/neon_site_info_all_2020.csv",
+neon.points <- read.csv("./spec_school_2026/EDDIE_Lab/neon_site_info_all_2026.csv",
                         stringsAsFactors = FALSE)
 
 # if you've entered the R2 values for your students' analysis, subset the
@@ -38,7 +34,7 @@ neon.points.sub <- subset(neon.points,
 
 # map title
 m.title <- "NDVI x Topography Correlations at NEON sites"
-m.subtitle <- "created on March 20, 2020, by K. Dahlin"
+m.subtitle <- "created on June 8, 2026, by K. Dahlin"
 
 # calculate the extent of the map based on the latitude and longitude in the
 # data table
