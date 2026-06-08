@@ -10,6 +10,21 @@ install.packages("rnaturalearthhires",
                  repos = "http://packages.ropensci.org", 
                  type = "source")
 
+# Install CRAN packages if not already installed
+packages <- c(
+  "ggplot2",
+  "sf",
+  "ggspatial",
+  "rnaturalearth",
+  "rnaturalearthdata"
+)
+
+new_packages <- packages[!(packages %in% installed.packages()[,"Package"])]
+
+if(length(new_packages) > 0) {
+  install.packages(new_packages)
+}
+
 # load libraries for making maps (install these too if you haven't already)
 library(ggplot2)
 library(sf)
@@ -47,6 +62,9 @@ world <- ne_countries(scale = "medium", returnclass = "sf")
 us.states <- ne_states(country = "United States of America", 
                        returnclass = "sf")
 
+st_crs(world)
+st_crs(us.states)
+
 # set the font sizes for the site IDs and correlation values
 site.size <- 2
 cor.size <- 4
@@ -75,9 +93,7 @@ ggplot(data = world) +
   geom_text(data = neon.points.sub, 
             aes(x = Longitude, y = Latitude, label = cor.R),
             color = "darkred", size = cor.size,
-            nudge_y = 0.4) + 
+            nudge_y = 0.4) +
   ggtitle(m.title,
           subtitle = m.subtitle)
-
-
 

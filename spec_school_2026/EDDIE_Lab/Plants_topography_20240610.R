@@ -5,7 +5,7 @@
 ###############################################################################
 
 # first install packages (you only need to do this once per computer)
-#install.packages(c("rgdal", "raster", "ggplot2", "terra"))
+install.packages(c("rgdal", "raster", "ggplot2", "terra"))
 
 # load the packages you need for this module
 library(ggplot2)
