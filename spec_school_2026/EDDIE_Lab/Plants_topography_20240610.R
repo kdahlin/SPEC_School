@@ -3,7 +3,6 @@
 # Author: Kyla M. Dahlin
 # Last Update: 20191029
 ###############################################################################
-#silly comment
 # first install packages (you only need to do this once per computer)
 #install.packages(c("rgdal", "raster", "ggplot2", "terra"))
 
@@ -12,6 +11,7 @@ library(ggplot2)
 library(viridisLite)
 library(terra)
 
+dtm <- rast(gopss)
 
 # load the data! these paths will need to be changed for other data sets
 # DTM = Digital Terrain Model (= DEM)
