@@ -16,6 +16,18 @@ library(terra)
 library(rhdf5)
 library(neonUtilities)
 
+# I cannot find this package rhdf5 So, 
+# 1. Install the Bioconductor package manager
+# if (!requireNamespace("BiocManager", quietly = TRUE)) {
+#   install.packages("BiocManager")}
+
+# 2. Install the rhdf5 package from Bioconductor
+# BiocManager::install("rhdf5")
+
+# 3. Load the library
+library(rhdf5)
+
+
 ## set input data directory - note this is written to work with a mapped network
 ## drive, you need to change "X:" to "/mnt/research/ersamlab/" if you are working
 ## via OnDemand
@@ -24,7 +36,7 @@ data.dir <- file.path("X:", "shared_data", "NEON_AOP_data", "MLBS", "2023",
 
 ## ----define-h5, results="hide"-----------------------------------------------------------------------------------------------------------------------------------------------
 # Define the h5 file name to be opened - CHANGE TO YOUR ASSIGNED TILE!
-h5_file <- paste0(data.dir,"/NEON_D07_MLBS_DP3_539000_4134000_bidirectional_reflectance.h5")
+h5_file <- paste0(data.dir,"/NEON_D07_MLBS_DP3_543000_4134000_bidirectional_reflectance.h5")
 
 
 ## ----view-file-strux, eval=FALSE, comment=NA---------------------------------------------------------------------------------------------------------------------------------
