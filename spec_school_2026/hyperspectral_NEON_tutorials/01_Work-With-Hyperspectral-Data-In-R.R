@@ -5,6 +5,12 @@
 
 ## ----install-load-library, results="hide"------------------------------------------------------------------------------------------------------------------------------------
 
+# to install the rhdf5 package (on your desktop or on OnDemand)
+install.packages("BiocManager")
+library(BiocManager)
+BiocManager::install("rhdf5")
+library(rhdf5)
+
 # Load `terra` and `rhdf5` packages to read NIS data into R
 library(terra)
 library(rhdf5)
