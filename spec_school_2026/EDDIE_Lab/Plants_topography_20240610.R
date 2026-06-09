@@ -11,7 +11,6 @@ library(ggplot2)
 library(viridisLite)
 library(terra)
 
-dtm <- rast(gopss)
 
 # load the data! these paths will need to be changed for other data sets
 # DTM = Digital Terrain Model (= DEM)
