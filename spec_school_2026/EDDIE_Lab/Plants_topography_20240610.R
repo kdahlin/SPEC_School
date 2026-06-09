@@ -3,7 +3,6 @@
 # Author: Kyla M. Dahlin
 # Last Update: 20191029
 ###############################################################################
-
 # first install packages (you only need to do this once per computer)
 install.packages(c("rgdal", "raster", "ggplot2", "terra"))
 
