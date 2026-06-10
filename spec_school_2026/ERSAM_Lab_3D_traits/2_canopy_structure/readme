@@ -1,0 +1,11 @@
+01_process jpg hemiphotos to LAI (for now just ERSAM Lab)
+015_download and process NEON raw hemiphotos to LAI (wait for now, park script here)
+02_download_neon lidar point clouds & organize in HPCC file structure
+03_initial LAD calculations *** needs to talk to canopyLazR (separate problem)
+04_fit k to hemiphoto LAI
+05_rerun LAD with k and run other metrics on all tiles
+06_mosaic tiles
+  - list of what is produced
+07_run metrics that need mosaicked data (moving window metrics)
+  - list of what is produced here
+
