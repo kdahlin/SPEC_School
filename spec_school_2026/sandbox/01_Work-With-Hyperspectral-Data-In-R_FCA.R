@@ -3,54 +3,46 @@
 # modified to work with ERSAM Lab file structure
 # modified for SPEC School 2026 by Kyla Dahlin
 
-## ----install-load-library, results="hide"------------------------------------------------------------------------------------------------------------------------------------
-
-# to install the rhdf5 package (on your desktop or on OnDemand)
-install.packages("BiocManager")
-library(BiocManager)
-BiocManager::install("rhdf5")
-library(rhdf5)
-
-# Load `terra` and `rhdf5` packages to read NIS data into R
-library(terra)
-library(rhdf5)
-library(neonUtilities)
-
-# I cannot find this package rhdf5 So, 
-# 1. Install the Bioconductor package manager
-# if (!requireNamespace("BiocManager", quietly = TRUE)) {
-#   install.packages("BiocManager")}
-
-# 2. Install the rhdf5 package from Bioconductor
+## ----install-load-library----------------------------------------------------
+# One-time install only (uncomment if these aren't installed yet):
+# install.packages("BiocManager")
 # BiocManager::install("rhdf5")
 
-# 3. Load the library
 library(rhdf5)
+library(terra)
+library(neonUtilities)
 
+## ----define-paths-and-tile---------------------------------------------------
+# >>> CHANGE THIS to your assigned tile <
+tile <- "NEON_D07_MLBS_DP3_544000_4134000_bidirectional_reflectance.h5"
 
-## set input data directory - note this is written to work with a mapped network
-## drive, you need to change "X:" to "/mnt/research/ersamlab/" if you are working
-## via OnDemand
-data.dir <- file.path("X:", "shared_data", "NEON_AOP_data", "MLBS", "2023",
+# Reflectance folder on the mounted ersamlab research share.
+# If the mount isn't connected: Finder > Cmd+K > smb://ufs.hpcc.msu.edu/rs-016/ersamlab
+# (Running on OnDemand/cluster instead? swap the root for:
+#  /mnt/research/ersamlab/shared_data/NEON_AOP_data/MLBS/2023/L3/Spectrometer/Reflectance )
+data.dir <- file.path("/Volumes/ersamlab", "shared_data",
+                      "NEON_AOP_data", "MLBS", "2023",
                       "L3", "Spectrometer", "Reflectance")
 
-## ----define-h5, results="hide"-----------------------------------------------------------------------------------------------------------------------------------------------
-# Define the h5 file name to be opened - CHANGE TO YOUR ASSIGNED TILE!
-h5_file <- paste0(data.dir,"/NEON_D07_MLBS_DP3_543000_4134000_bidirectional_reflectance.h5")
+h5_mount <- file.path(data.dir, tile)
+stopifnot(file.exists(h5_mount))   # stops with a clear error if the mount/path is wrong
 
+## ----copy-locally-------------------------------------------------------------
+# HDF5 won't open files directly over the macOS SMB mount, so work from a local
+# copy. This copies only once (~700 MB per tile); re-running is instant.
+local_copy <- file.path(Sys.getenv("HOME"), "Desktop", basename(h5_mount))
+if (!file.exists(local_copy)) file.copy(h5_mount, local_copy)
 
-## ----view-file-strux, eval=FALSE, comment=NA---------------------------------------------------------------------------------------------------------------------------------
-# look at the HDF5 file structure 
-View(h5ls(h5_file,all=T))
+h5_file <- local_copy   # everything downstream uses the local copy
 
+## ----view-file-strux----------------------------------------------------------
+Sys.setenv(HDF5_USE_FILE_LOCKING = "FALSE")   # harmless safeguard
+View(h5ls(h5_file, all = TRUE))
 
-## ----read-band-wavelength-attributes-----------------------------------------------------------------------------------------------------------------------------------------
-
-# get information about the wavelengths of this dataset
-wavelengthInfo <- h5readAttributes(h5_file,"/MLBS/Reflectance/Metadata/Spectral_Data/Wavelength")
+## ----read-band-wavelength-attributes------------------------------------------
+wavelengthInfo <- h5readAttributes(h5_file,
+                                   "/MLBS/Reflectance/Metadata/Spectral_Data/Wavelength")
 wavelengthInfo
-
-
 
 ## ----read-band-wavelengths---------------------------------------------------------------------------------------------------------------------------------------------------
 # read in the wavelength information from the HDF5 file

@@ -6,38 +6,32 @@
 ## ----install-load-library, results="hide"------------------------------------------------------------------------------------------------------------------------------------
 
 # to install the rhdf5 package (on your desktop or on OnDemand)
-install.packages("BiocManager")
+# install.packages("BiocManager")
 library(BiocManager)
-BiocManager::install("rhdf5")
+# BiocManager::install("rhdf5")
 library(rhdf5)
 
 # Load `terra` and `rhdf5` packages to read NIS data into R
 library(terra)
 library(rhdf5)
-library(neonUtilities)
 
-# I cannot find this package rhdf5 So, 
-# 1. Install the Bioconductor package manager
-# if (!requireNamespace("BiocManager", quietly = TRUE)) {
-#   install.packages("BiocManager")}
+# install.packages("neonUtilities")
+# install.packages("neonUtilities", dependencies = c("Depends", "Imports"))
 
-# 2. Install the rhdf5 package from Bioconductor
-# BiocManager::install("rhdf5")
-
-# 3. Load the library
-library(rhdf5)
-
+# library(neonUtilities)
 
 ## set input data directory - note this is written to work with a mapped network
 ## drive, you need to change "X:" to "/mnt/research/ersamlab/" if you are working
 ## via OnDemand
-data.dir <- file.path("X:", "shared_data", "NEON_AOP_data", "MLBS", "2023",
+data.dir <- file.path("/mnt/research", "ersamlab", "shared_data", "NEON_AOP_data", "MLBS", "2023",
                       "L3", "Spectrometer", "Reflectance")
 
 ## ----define-h5, results="hide"-----------------------------------------------------------------------------------------------------------------------------------------------
 # Define the h5 file name to be opened - CHANGE TO YOUR ASSIGNED TILE!
 h5_file <- paste0(data.dir,"/NEON_D07_MLBS_DP3_543000_4134000_bidirectional_reflectance.h5")
 
+# Confirm the file can be reached
+file.exists(h5_file)
 
 ## ----view-file-strux, eval=FALSE, comment=NA---------------------------------------------------------------------------------------------------------------------------------
 # look at the HDF5 file structure 
@@ -97,7 +91,11 @@ class(b34)
 
 
 
-## ----read-attributes-plot, fig.cap=c("Plot of reflectance values for band 34 data. This plot shows a very washed out image lacking any detail.","Plot of log transformed reflectance values for band 34 data. Log transformation improved the visibility of details in the image, but it is still not great.")----
+## ----read-attributes-plot, fig.cap=c("Plot of reflectance values for band 34 data. 
+# This plot shows a very washed out image lacking any detail.","Plot of log transformed 
+# reflectance values for band 34 data. 
+# Log transformation improved the visibility of details in the image, 
+# but it is still not great.")----
     
 # look at the metadata for the reflectance dataset
 h5readAttributes(h5_file,"/MLBS/Reflectance/Reflectance_Data")
@@ -212,4 +210,22 @@ plot(b34r,
 # close the H5 file
 H5close()
 
+
+# The Code to Generate Your TIFF File
+
+# 1. Define the filename and output path on the cluster
+output_tiff_path <- file.path("/mnt/research/ersamlab/shared_data", "NEON_Band34_Reflectance_Tile.tif")
+
+# 2. Write the SpatRaster object out to a physical GeoTIFF file
+# (The 'overwrite=TRUE' lets me run the line again if I  change things later)
+writeRaster(b34r, filename = output_tiff_path, overwrite = TRUE)
+
+# 3. Check your work to ensure the file now physically exists on the disk
+file.exists(output_tiff_path)
+
+# Copy the file from the shared directory to my local working directory
+file.copy(from = output_tiff_path, to = "./NEON_Band34_Reflectance_Tile.tif")
+# The NEON_Band34_Reflectance_Tile.tif is located at mnt>ffs24>home>f011368>SPEC_School
+
+getwd()
 

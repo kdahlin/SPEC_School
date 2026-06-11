@@ -192,5 +192,5 @@ plot(ndviCalc, main="NDVI for the NEON MLBS Field Site", col=myCol, breaks=brk)
 ## ----save-raster-geotiff, eval=FALSE, comment=NA----------------------------------------------------------------------------------------------------------------
 # Write out final NDVI raster	
 # Note: if you set overwrite to TRUE, then you will overwrite (and lose) any older version of the tif file! 
-writeRaster(bandStack, file=paste0(save.dir, "/ndvi_tiles/", out.pref,
-                                   "6bands.tif"), overwrite=FALSE)
+writeRaster(ndviCalc, file=paste0(save.dir, "/ndvi_tiles/", out.pref,
+                                   "NDVI.tif"), overwrite=FALSE)
