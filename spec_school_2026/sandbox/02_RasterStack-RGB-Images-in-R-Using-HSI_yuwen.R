@@ -4,6 +4,8 @@
 # modified for SPEC School 2026 by Kyla Dahlin
 
 ## ----load-libraries, results="hide"-----------------------------------------------------------------------------------------------------------------------------
+a
+
 library(terra)
 library(rhdf5)
 library(neonUtilities)
@@ -19,10 +21,11 @@ save.dir <- file.path("X:", "shared_data", "NEON_proc_data", "MLBS", "2023")
 
 ## ----define-h5, results="hide"-----------------------------------------------------------------------------------------------------------------------------------------------
 # Define the h5 file name to be opened - CHANGE TO YOUR ASSIGNED TILE!
-h5_file <- paste0(data.dir,"/NEON_D07_MLBS_DP3_539000_4134000_bidirectional_reflectance.h5")
+# 541000:544000,4137000;; 539000:544000,4138000
+h5_file <- paste0(data.dir,"/NEON_D07_MLBS_DP3_541000_4137000_bidirectional_reflectance.h5")
 
 ## Define out file prefix for saving files later - CHANGE TO YOUR ASSIGNED TILE!
-out.pref <- "/NEON_D07_MLBS_DP3_539000_4134000_"
+out.pref <- "/NEON_D07_MLBS_DP3_541000_4137000_"
 
 ## ----get-spatial-attributes-------------------------------------------------------------------------------------------------------------------------------------
 
@@ -85,8 +88,8 @@ band2Raster <- function(file, band, noDataValue, extent, CRS){
 
 # create a list of the bands (R,G,B) we want to include in our stack
 # B = 19
-# G = 34
-# R = 58
+# G = 34;35
+# R = 58;53
 # NIR = 95
 # SWIR1 = 253
 # SWIR2 = 350
@@ -97,7 +100,35 @@ bands_rast <- lapply(bands,FUN=band2Raster, file = h5_file,
                    noDataValue=h5NoDataValue, 
                    ext=rastExt,
                    CRS=h5CRS)
+str(bands_rast)
 
+# Step 3: Create 6-band GeoTIFF for each tile
+tile_tifs <- character(length(h5_files))
+
+for(i in seq_along(h5_files)){
+  
+  cat(i, "of", length(h5_files), "\n")
+  
+  r <- read_tile_6band(h5_files[i])
+  
+  outfile <- file.path(
+    save.dir,
+    paste0(
+      tools::file_path_sans_ext(
+        basename(h5_files[i])
+      ),
+      "_6band.tif"
+    )
+  )
+  
+  writeRaster(
+    r,
+    outfile,
+    overwrite = TRUE
+  )
+  
+  tile_tifs[i] <- outfile
+}
 
 ## ----rgb-rast-properties----------------------------------------------------------------------------------------------------------------------------------------
 bands_rast
@@ -116,7 +147,7 @@ bandNames <- paste("Band_",unlist(bands),sep="")
 names(bandStack) <- bandNames
 
 # check properties of the raster list - note the band names
-bandStack
+bandStack #1000, 1000, 6
 
 
 ## ----scale-plot-refl--------------------------------------------------------------------------------------------------------------------------------------------
@@ -192,5 +223,6 @@ plot(ndviCalc, main="NDVI for the NEON MLBS Field Site", col=myCol, breaks=brk)
 ## ----save-raster-geotiff, eval=FALSE, comment=NA----------------------------------------------------------------------------------------------------------------
 # Write out final NDVI raster	
 # Note: if you set overwrite to TRUE, then you will overwrite (and lose) any older version of the tif file! 
+# Modify the output file and it's name
 writeRaster(ndviCalc, file=paste0(save.dir, "/ndvi_tiles/", out.pref,
-                                   "NDVI.tif"), overwrite=FALSE)
+                                   "ndvi.tif"), overwrite=TRUE)
