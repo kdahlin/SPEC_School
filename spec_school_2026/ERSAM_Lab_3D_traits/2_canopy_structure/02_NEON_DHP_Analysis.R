@@ -94,7 +94,7 @@ photo.data <- loadByProduct(dpID = product_code,
                       check.size = TRUE)
 
 # let's subset to the data we care about
-images <- data$dhp_perimagefile
+images <- photo.data$dhp_perimagefile
 
 # Subset to only upward facing images
 images <- images[images$imageType == "overstory",]
