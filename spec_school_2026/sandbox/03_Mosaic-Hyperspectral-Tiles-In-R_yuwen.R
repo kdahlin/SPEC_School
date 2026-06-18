@@ -7,6 +7,10 @@ library(terra)
 library(rhdf5)
 library(neonUtilities)
 
+# # parallelize
+# library(future.apply)
+# plan(multisession, workers = 6)
+
 ## set input data directory - note this is written to work with a mapped network
 ## drive, you need to change "X:" to "/mnt/research/ersamlab/" if you are working
 ## via OnDemand
@@ -40,12 +44,15 @@ file.exists(h5_files)
 sum(file.exists(h5_files)) #30
 
 # get the Reflectance_Data attributes
-reflInfo <- h5readAttributes(h5_file,"/MLBS/Reflectance/Reflectance_Data" )
+# h5_file <- paste0(data.dir,"/NEON_D07_MLBS_DP3_541000_4137000_bidirectional_reflectance.h5")
+h5_file = h5_files[1]
+reflInfo <- h5readAttributes(h5_file,"/MLBS/Reflectance/Reflectance_Data")
 
 h5NoDataValue <- as.integer(reflInfo$Data_Ignore_Value)
 cat('No Data Value:',h5NoDataValue)
 
-sprc(h5_files)
+# sprc(h5_files)
+# sprc(h5_file)
 
 # Step 2: Function to read a 6-band tile
 # create a list of the bands (R,G,B) we want to include in our stack
@@ -55,6 +62,7 @@ sprc(h5_files)
 # NIR = 95
 # SWIR1 = 253
 # SWIR2 = 350
+
 read_tile_6band <- function(h5_file, bands = c(19,34,58,95,253,350)) {
   
   # CRS
@@ -146,12 +154,17 @@ for(i in seq_along(h5_files)){
 # Step 4: Mosaic all 30 tiles
 rasters <- lapply(tile_tifs, rast)
 
+# mosaic should do better job than merge
 # mosaic_6band <- do.call(
 #   merge,
 #   rasters
 # )
 
-mosaic_6band <- mosaic(rasters, fun = "median") #"mean"
+mosaic_6band_v2 <- do.call(mosaic, c(rasters, fun="median")) #or fun="median"
+
+# improved version
+r <- sprc(lapply(h5_files, read_tile_6band))
+mosaic_6band <- mosaic(r)
 
 
 mosaic_6band
@@ -162,6 +175,22 @@ mosaic_6band_scaled <- mosaic_6band/as.integer(reflInfo$Scale_Factor)
 # (1) inconsistent radiometry between scenes, 
 # (2) imperfect cloud/shadow masking, 
 # (3) simple compositing instead of quality-based blending
+# outfile <- file.path(
+#   save.dir,
+#   paste0("mosaic/",
+#          tools::file_path_sans_ext(
+#            substr(basename(h5_files[1]), start = 1, stop = 32)
+#          ),
+#          "_6band.tif"
+#   ))
+
+plotRGB(
+  # mosaic_6band,
+  # mosaic_6band_v2,
+  mosaic,
+  r=3,g=2,b=1,
+  stretch = "lin")
+
 plotRGB(mosaic_6band_scaled,
         r=3,g=2,b=1,
         stretch = "lin")
@@ -172,7 +201,11 @@ writeRaster(
   mosaic_6band_scaled,
   file.path(
     save.dir, "mosaic",
-    "MLBS_2023_6band_simple_mosaic.tif"
+    "MLBS_2023_6band_mosaic.tif"
   ),
   overwrite = TRUE
 )
+
+
+ra_file <- file.path(save.dir, "mosaic","MLBS_2023_6band_mosaic.tif")
+mosaic <- rast(ra_file)
