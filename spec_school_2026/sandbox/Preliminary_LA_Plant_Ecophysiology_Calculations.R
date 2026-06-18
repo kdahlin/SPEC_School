@@ -140,13 +140,153 @@ print(all_boxplots)
 # Ecological interpretation 
 
 # South-Facing Samples exhibit higher values for 
-# 1- total leaf area
-# 2- diameter (DBH)
+# 1- diameter (DBH)
+# 2- allometric equation derived total leaf area
 # This suggest adaptation to an environment with higher light availability
 # This could translate in greater vertical growth and expansive canopy development.
 
 # North-Facing Samples display smaller median heights and total leaf areas, alongside wide variations in DBH
 
+# Physiology considerations:
+
+# Leaf Water Content (North > South): The north-facing trees display 
+# higher median leaf water content (~63.7% vs. ~59.5%). 
+# North-facing slopes are typically cooler, more humid, and less 
+# prone to intense solar radiation, reducing evapotranspiration
+# South-facing slopes experience higher solar radiation, 
+# driving down foliar water retention.
+
+# Chlorophyll Content (North > South): The median chlorophyll 
+# content was slighly higher in the north-facing leaves. 
+# This could be a physiological response to shade. 
+# Under lower-light conditions (north slopes), plants often 
+# upregulate chlorophyll concentration per unit leaf area to
+# maximize light-harvesting efficiency in the shade.
 
 
 
+# OTHER WAY 
+
+
+library(tidyr)
+library(ggplot2)
+library(dplyr)
+
+# 1. Prepare your long data (your original step)
+plot_data_long <- ecophys_results %>%
+  select(slope, height_m, dbh_cm, leaf_water_content, 
+         mean_chlorophyll_content, leaf_area_m2, 
+         la_to_height_ratio, individual_tree_lai) %>%
+  pivot_longer(
+    cols = -slope, 
+    names_to = "variable", 
+    values_to = "value"
+  )
+
+# 2. Get a list of all unique variables
+variables_list <- unique(plot_data_long$variable)
+
+# 3. Loop through each variable to create and save individual plots
+for (var_name in variables_list) {
+  
+  # Filter data for just this variable
+  single_var_data <- plot_data_long %>% 
+    filter(variable == var_name)
+  
+  # Create the individual plot
+  individual_plot <- ggplot(single_var_data, aes(x = slope, y = value, fill = slope)) +
+    geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+    geom_jitter(width = 0.15, size = 2, aes(color = slope)) +
+    labs(
+      title = paste("Distribution of", var_name, "by Slope Aspect"),
+      x = "Slope Aspect",
+      y = var_name
+    ) +
+    theme_bw() +
+    theme(legend.position = "none")
+  
+  # Print to your RStudio plot viewer
+  print(individual_plot)
+  
+  # Optional: Save each plot automatically as a separate PNG file
+  # ggsave(filename = paste0("boxplot_", var_name, ".png"), plot = individual_plot, width = 6, height = 4)
+}
+
+
+
+
+##############################################################
+
+#                          SLA
+
+##############################################################
+
+
+
+# Title: leaf_area_calculations.R
+# Author: KMD & TRG 
+# Date: 03/02/2026
+# This script for calculating leaf area (cm2 and m2) from ERSAM lab leaf scans.
+
+# load packages 
+library(terra)
+library(tidyverse)
+library(tools)
+
+#-----------------
+# USER DEFINED VARIABLES 
+#-----------------
+
+# read in config file with site info
+source("0_config_files/config_base.R")  
+
+# define directories for scan data and output 
+scan.dir <- file.path(root, "shared_data/NEON_field_data", site, year, "ERSAM",
+                      "Lab_Data", "Leaf_Scans", "Corrected")
+out.dir <- file.path(root, "shared_data/NEON_field_data", site, year, "ERSAM",
+                     "Lab_Data", "Leaf_Scans")
+
+# set the out file name
+out.file.name <- paste0(site, substr(year,3,4), "_LeafScans_", wd, ".csv")
+
+#--------------------------
+# list files and create output data frame
+#--------------------------
+
+# list all the leaf scan png files in the directory
+scan.files <- list.files(path = scan.dir,
+                         pattern = c("\\.png$"),
+                         full.names = TRUE)
+
+# make a data frame to write names to
+out.data <- as.data.frame(matrix(NA, nrow = length(leaf.files), ncol = 4))
+names(out.data) <- c("ID", "pixels", "area_cm2", "area_m2")
+
+# pull out the file name without the file extension to use as an ID 
+out.data$ID <- file_path_sans_ext(basename(scan.files))
+
+#------------------------------------
+# Main loop: read in scans, rasterize, reclassify as binary and calculate number  
+# of pixels, then calculate area and append to data frame.
+#------------------------------------
+
+# loop to read in each file and calculate area in cm2 and m2
+for (i in seq_along(scan.files)) {
+  in.pic <- rast(scan.files[i])
+  
+  # reclassify raster to make sure it's binary: 1 for values < 1, 0 for others 
+  mask <- classify(in.pic[[1]], rcl = matrix(c(-Inf, 1, 1, 1, Inf, 0), ncol = 3, 
+                                             byrow = TRUE))
+  
+  # Count how many pixels have value 1 (i.e., where original < 1)
+  pix.count <- as.numeric(global(mask, fun = "sum", na.rm = TRUE))
+  
+  out.data$pixels[i] <- pix.count
+  out.data$area_cm2[i] <- pix.count * ((2.53^2)/(150^2))
+  out.data$area_m2[i] <- out.data$area_cm2[i] / (100^2)
+}
+
+
+# write csv
+write_csv(out.data, file.path(out.dir, out.file.name),
+          col_names = TRUE)
