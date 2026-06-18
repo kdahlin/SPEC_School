@@ -1,14 +1,6 @@
 
 
 
-install.packages("vctrs", type = "binary")
-library(dplyr)
-
-# ------------------------------------------------------------------
-# Red Maple (ACRU) Leaf Area Calculation
-# Model from Brantley et al. (2016)
-# ------------------------------------------------------------------
-
 # ------------------------------------------------------------------
 # MLBS Ecophys Group: Slope-Specific Red Maple LAI Analysis
 # Allometrics adapted from Brantley et al. (2016)
