@@ -13,8 +13,9 @@ field_data <- data.frame(
   tree_id  = 1:6,
   height_m = c(17.5, 11.5, 10.0, 12.0, 18.0, 12.0),
   dbh_cm   = c(29.0, 18.8, 32.5, 28.5, 25.1, 15.3),
-  slope    = c("South", "North", "North", "South", "South", "North")
-)
+  slope    = c("South", "North", "North", "South", "South", "North"),
+  leaf_water_content = c(57.61, 63.67, 63.91, 60.82, 59.51, 58.17),
+  mean_chlorophyll_content = c(27.67, 35.60, 32.30, 31.67, 37.03, 34.27))
 
 # Brantley et al 2016 Table 6 Coefficients (Foliage Area m2 for ACRU)
 # https://research.fs.usda.gov/download/treesearch/52752.pdf
@@ -43,29 +44,28 @@ ecophys_results <- field_data %>%
     individual_tree_lai     = leaf_area_m2 / estimated_crown_area_m2
   )
 
-#  Slope-Level Ecological Summaries
-slope_summary <- ecophys_results %>%
-  group_by(slope) %>%
+# Slope-level ecological summaries
+slope_summary <- ecophys_results %>% 
+  group_by(slope) %>% 
   summarize(
-    sample_size          = n(),
-    mean_leaf_area_m2    = mean(leaf_area_m2),
+    sample_size = n(),
+    mean_leaf_area_m2 = mean(leaf_area_m2),
     mean_la_height_ratio = mean(la_to_height_ratio),
-    mean_individual_lai  = mean(individual_tree_lai),
+    mean_individual_lai = mean(individual_tree_lai),
+    mean_water_content = mean(leaf_water_content),
+    mean_chlorophyll = mean(mean_chlorophyll_content),
     .groups = "drop"
   )
+
 
 # ------------------------------------------------------------------
 # Summary 
 # ------------------------------------------------------------------
-cat("=== INDIVIDUAL ECOPHYS METRICS ===\n")
-print(ecophys_results %>% 
-        select(tree_id, slope, dbh_cm, height_m, leaf_area_m2, la_to_height_ratio, individual_tree_lai) %>%
-        mutate(across(where(is.numeric), ~ round(., 2))) %>%
-        arrange(slope))
+print("--- Individual Tree Results ---")
+print(ecophys_results)
 
-cat("\n=== SLOPE-LEVEL COMPARATIVE ADVANTAGES ===\n")
-print(slope_summary %>% mutate(across(where(is.numeric), ~ round(., 3))))
-
+print("--- Slope Summary ---")
+print(slope_summary)
 
 # Potential outcome from this rough preliminary data:
 # The Leaf Area:Height Ratio: 
