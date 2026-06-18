@@ -80,3 +80,73 @@ print(slope_summary)
 # maples on south-facing terrains seems to have more open, light-permeable foliage 
 # architectures to cope with greater solar heat load in the peak of the summer.
 
+
+
+
+################################################################################
+
+#                            Graphing and correlation 
+
+#################################################################################
+
+
+library(dplyr)
+library(ggplot2)
+library(gridExtra) # For arranging the plots side-by-side
+
+
+
+# ------------------------------------------------------------------ 
+#                 Data Visualization (Boxplots)
+# ------------------------------------------------------------------
+
+
+
+library(tidyr) 
+
+plot_data_long <- ecophys_results %>%
+  select(slope, height_m, dbh_cm, leaf_water_content, 
+         mean_chlorophyll_content, leaf_area_m2, 
+         la_to_height_ratio, individual_tree_lai) %>%
+  # Step 2: Reshape data from wide to long format
+  pivot_longer(
+    cols = -slope, 
+    names_to = "variable", 
+    values_to = "value"
+  )
+
+
+all_boxplots <- ggplot(plot_data_long, aes(x = slope, y = value, fill = slope)) +
+  geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+  geom_jitter(width = 0.15, size = 2, aes(color = slope)) +
+  # Scales = "free_y" gives each variable its own unique Y-axis range
+  facet_wrap(~ variable, scales = "free_y", ncol = 3) + 
+  labs(
+    title = "Ecophysiological Metrics by Slope Aspect",
+    x = "Slope Aspect",
+    y = "Measured Value"
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "none",
+    strip.text = element_text(face = "bold", size = 10), # Subheading text formatting
+    panel.spacing = unit(1, "lines")
+  )
+
+# Render the grid
+print(all_boxplots)
+
+
+# Ecological interpretation 
+
+# South-Facing Samples exhibit higher values for 
+# 1- total leaf area
+# 2- diameter (DBH)
+# This suggest adaptation to an environment with higher light availability
+# This could translate in greater vertical growth and expansive canopy development.
+
+# North-Facing Samples display smaller median heights and total leaf areas, alongside wide variations in DBH
+
+
+
+
