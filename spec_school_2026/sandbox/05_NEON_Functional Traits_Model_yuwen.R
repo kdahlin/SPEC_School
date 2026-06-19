@@ -14,7 +14,6 @@ library(mgcv)
 ############################################################
 # Step 1: Read data
 ############################################################
-
 field_df <- read.csv("X:/shared_data/NEON_field_data/MLBS/NEONForestAGBv2_Jenkins_MLBS_plot_2022.csv")
 spc_df   <- read.csv("X:/shared_data/NEON_field_data/MLBS/MLBS_VIs_PCA_Hyperspectral.csv")
 lidar_df <- read.csv("X:/shared_data/NEON_field_data/MLBS/MLBS_AOP_Lidar_Metrics.csv")
