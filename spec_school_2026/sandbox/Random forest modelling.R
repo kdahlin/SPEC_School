@@ -11,6 +11,7 @@ library(ggplot2)
 # variables selection using random forest
 library(VSURF)
 
+##### Step1: Cleaning data ##### 
 field_df <- read.csv('X:/shared_data/NEON_field_data/MLBS/NEONForestAGBv2_Jenkins_MLBS_plot_2022.csv')
 view(field_df)
 spc_df <- read.csv('X:/shared_data/NEON_field_data/MLBS/MLBS_VIs_PCA_Hyperspectral.csv')
@@ -56,8 +57,7 @@ View(df_clean3)
 
 # df_clean <- df_clean[-c(1:3)]
 
-
-# Correlation
+##### Step2:  Correlation ##### 
 cor_df <- data.frame(
   cor = sapply(df_clean3, function(b) {
     cor(df_clean3[-c(1:3,38:40)],
@@ -91,17 +91,11 @@ ggplot(cor_df, aes(x = reorder(variable, cor), y = cor)) +
   labs(x = "Variables",
        y = "Correlation with AGB_Mg_ha")
 
+# cor_mat <- cor(vars, use = "complete.obs")
+# 
+# cor_mat1 <- cor(vars1, use = "complete.obs")
+# cor_mat2 <- cor(vars2, use = "complete.obs")
 
-vars <- df_clean3[-c(1:3, 38:40)]
-vars1 <- df_clean1[-c(1:3, 38:41)]
-vars2 <- df_clean2[-c(1:3, 18:21)]
-cor_mat <- cor(vars, use = "complete.obs")
-
-cor_mat1 <- cor(vars1, use = "complete.obs")
-cor_mat2 <- cor(vars2, use = "complete.obs")
-
-names(df_clean1)
-names(df_clean2)
 
 library(corrplot)
 corrplot(cor_mat,
@@ -177,13 +171,28 @@ corrplot(cor_mat2,
          col = colorRampPalette(c("blue", "white", "red"))(200))
 
 
+##### Step3: Modelling ##### 
+names(df_clean1)
+names(df_clean2)
+# Variables
+vars1 <- c("PC4","PC2","PRI","ARI1","TCARI","ExG","SIPI")
+vars2 <- c("H_99","H_95","H_90","H_cv","H_mean","H_SD","LII")
 
-#lidar predictors
-# lidar_vars <- c("meanHt", "p95", "cover", "FHD")
 
+#### data for Hyperspectral
+df_clean1
 # Hyperspectral predictors
-hs_vars <- names(spc_df)[-(1:3)]
+hs_vars <- vars1
 
+
+#### data for Lidar
+df_clean2
+names(df_clean2)
+#lidar predictors
+lidar_vars <- vars2
+
+# Lidar + Hyperspectral
+vars <- c(vars1, vars2)
 
 # Response
 y_var <- "AGB_Mg_ha"
@@ -227,23 +236,82 @@ rf_loocv <- function(data, predictors, response) {
   ))
 }
 
-model_lidar <- rf_loocv(data, lidar_vars, y_var)
-
-model_lidar$R2
-model_lidar$RMSE
-
-model_hs <- rf_loocv(df_clean, hs_vars, y_var)
-
-model_hs$R2
-model_hs$RMSE
-
-model_hs2 <- randomForest(
+# Lidar Only
+# model_lidar <- rf_loocv(data, lidar_vars, y_var)
+# % Var explained: -35.62
+model_lidar <- randomForest(
   AGB_Mg_ha ~ .,
-  data = df_clean[, c(y_var, hs_vars)],
+  data = df_clean2[, c(y_var, lidar_vars)],
   ntree = 500,
   importance = TRUE
 )
 
+# Hyperspecrtal Only
+# % Var explained: -49.95
+model_hyper <- randomForest(
+  AGB_Mg_ha ~ .,
+  data = df_clean1[, c(y_var, hs_vars)],
+  ntree = 500,
+  importance = TRUE
+)
+
+# Hyper + Lidar
+# % Var explained: -56.68
+model_com <- randomForest(
+  AGB_Mg_ha ~ .,
+  data = df_clean3[, c(y_var, vars)],
+  ntree = 500,
+  importance = TRUE
+)
+
+###Plot important features####
+model_com$importance
+
+imp <- model_com$importance
+imp <- as.data.frame(imp)
+# remove NA rows if any
+imp <- na.omit(imp)
+
+varImpPlot(model_com,
+           type = 1,   # %IncMSE
+           main = "Random Forest Variable Importance")
+
+# Another way to plot Feature Imp rate
+imp <- data.frame(
+  variable = rownames(model_com$importance),
+  importance = model_com$importance[,1]   # usually %IncMSE
+)
+imp <- imp[order(imp$importance, decreasing = TRUE), ]
+
+
+ggplot(imp, aes(x = reorder(variable, importance),
+                y = importance)) +
+  geom_col() +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "Variables",
+       y = "Importance",
+       title = "Random Forest Variable Importance")
+
+
+# model_lidar$R2
+# model_lidar$RMSE
+
+# model_hs <- rf_loocv(df_clean, hs_vars, y_var)
+# 
+# model_hs$R2
+# model_hs$RMSE
+# 
+# model_hs2 <- randomForest(
+#   AGB_Mg_ha ~ .,
+#   data = df_clean[, c(y_var, hs_vars)],
+#   ntree = 500,
+#   importance = TRUE
+# )
+
+
+
+##### Predictions ##### 
 preds <- predict(model_hs2, df_clean)
 head(preds)
 
@@ -297,43 +365,51 @@ plot(data[[y_var]], model_hs2$predictions,
 
 abline(0, 1, col = "red", lwd = 2)
 
-final_model <- randomForest(
-  Biomass ~ .,
-  data = data[, c(y_var, all_vars)],
-  ntree = 500,
-  importance = TRUE
-)
+# final_model <- randomForest(
+#   Biomass ~ .,
+#   data = data[, c(y_var, all_vars)],
+#   ntree = 500,
+#   importance = TRUE
+# )
 
 importance(final_model)
 varImpPlot(final_model)
 
 
-# GAM model
+##### GAM model #####
 
 library(mgcv)
-head(df_clean)
-
-hs_vars <- names(df_clean)[-(1:2)]
-var1 <- hs_vars[-c(32:34)]
-
-form <- as.formula(
-  paste("AGB_Mg_ha ~", paste("s(", hs_vars, ")", collapse = " + "))
+# R-sq.(adj) =  0.321   Deviance explained = 65.1%
+gam_model_hs <- gam(
+  AGB_Mg_ha ~ 
+    s(PC4) + s(PC2) + s(PRI) + s(ARI1) + 
+    s(TCARI) + s(ExG) + s(SIPI),
+  
+  data = df_clean1,
+  method = "REML"
 )
+summary(gam_model_hs)
 
-form1 <- as.formula(
-  paste("AGB_Mg_ha ~", paste("s(", var1, ")", collapse = " + "))
+gam_model_lidar <- gam(
+  AGB_Mg_ha ~ 
+    s(H_99) + s(H_95) + s(H_90) +
+    s(H_cv) + s(H_mean) + s(H_SD) + s(LII),
+  
+  data = df_clean2,
+  method = "REML"
 )
+summary(gam_model_lidar)
 
-gam_model <- gam(form,
-                 data = df_clean,
-                 method = "REML")
 
-summary(gam_model)
-
-# Only PCA1
-gam_model1 <- gam(form1,
-                 data = df_clean,
-                 method = "REML")
+gam_model_com <- gam(
+  AGB_Mg_ha ~ 
+    s(PC2) + s(PRI) + s(ExG) + 
+    s(H_99) + s(H_95) + s(H_mean) + s(H_cv),
+  
+  data = df_clean3,
+  method = "REML"
+)
+summary(gam_model_com)
 
 
 ggplot(df_clean, aes(x = AGB_Mg_ha, y = gam_pred)) +
@@ -342,3 +418,42 @@ ggplot(df_clean, aes(x = AGB_Mg_ha, y = gam_pred)) +
   coord_equal() +
   theme_minimal() +
   labs(x = "Observed AGB", y = "Predicted AGB")
+
+
+##### Linear regression ##### 
+lm_hs <- lm(
+  AGB_Mg_ha ~ PC4 + PC2 + PRI + ARI1 + TCARI + ExG + SIPI,
+  data = df_clean1
+)
+# Adjusted R-squared:  0.2918
+summary(lm_hs)
+
+
+lm_lidar <- lm(
+  AGB_Mg_ha ~ H_99 + H_95 + H_90 + H_cv + H_mean + H_SD + LII,
+  data = df_clean2
+)
+# Adjusted R-squared:  0.3669 
+summary(lm_lidar)
+
+lm_com <- lm(
+  AGB_Mg_ha ~ PC4 + PC2 + PRI + ARI1 + TCARI + ExG + SIPI +
+    H_99 + H_95 + H_90 + H_cv + H_mean + H_SD + LII,
+  data = df_clean3
+)
+# Adjusted R-squared:  -0.2772
+summary(lm_com)
+
+glm_hs <- glm(
+  AGB_Mg_ha ~ PC4 + PC2 + PRI + ARI1 + TCARI + ExG + SIPI,
+  data = df_clean,
+  family = gaussian()
+)
+
+summary(glm_hs)
+
+hist(df_clean3$total_AGB_kg,
+     breaks = 30,
+     col = "steelblue",
+     main = "Distribution of Total AGB",
+     xlab = "Total AGB (kg)")
