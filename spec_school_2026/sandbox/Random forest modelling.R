@@ -457,3 +457,4 @@ hist(df_clean3$total_AGB_kg,
      col = "steelblue",
      main = "Distribution of Total AGB",
      xlab = "Total AGB (kg)")
+

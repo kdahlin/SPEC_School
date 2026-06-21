@@ -13,8 +13,6 @@ spc_df <- read.csv('X:/shared_data/NEON_field_data/MLBS/MLBS_VIs_PCA_Hyperspectr
 dim(spc_df)
 head(spc_df)
 
-spec_agb <-
-lidar_df
 
 spectra_long_agb <- spectra_long %>%
   left_join(agb_plot, by = "plotID")
